@@ -2,7 +2,7 @@
 library(tidyverse)
 
 ## path of loanbook 
-path  <- file.path("~", "data", "fundingcircle", "loanbook.csv")
+path  <- file.path("loanbook.csv")
 
 ## Load data with miss spec as N/A
 loanbook <- read_csv(path, na='N/A')
