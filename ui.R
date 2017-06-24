@@ -39,7 +39,8 @@ body <- dashboardBody(
             fluidRow(
               tags$head(includeScript("google-analytics.js")),
               column(width = 4, 
-                     box(width = NULL)),
+                     box(width = NULL,
+                         plotlyOutput("plottotal"))),
               column(width = 8,
                      box(width = NULL)
                      )

@@ -15,7 +15,18 @@ options(warn = - 1)
 
 shinyServer(function(input, output) {
 
+  ## Filter data
+  fcloanbook <- reactive(
+    loanbook
+  )
 
+  ## Plot total lent
+  output$plottotal <- renderPlotly(
+    plot_by_date(fcloanbook(), 
+                             by = "loan_amount", 
+                             strat = "credit_band",
+                             plotly = TRUE)
+  )
   ## Set up downloadable scripts
   output$downloadData0 <- downloadHandler(filename = "dataclean.R",
                                           content = function(file) {
