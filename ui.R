@@ -6,6 +6,9 @@ library(tidyverse)
 library(rmarkdown)
 library(caret)
 library(ggfortify)
+library(plotly)
+library(lubridate)
+library(wrapr)
 
 ## Source cleaned data
 source("dataclean.R")
@@ -93,7 +96,7 @@ conditionalPanel(condition = 'input.menu == "pca"',
                              max = 10,
                              value = 1),
                  sliderInput(inputId = "pca_2", 
-                             label = "First component to plot:",
+                             label = "Second component to plot:",
                              min = 0,
                              max = 10,
                              value = 2),
@@ -130,11 +133,11 @@ body <- dashboardBody(
                       title = "Summary Plots",
                       side = "right",
                       tabPanel(title = "By Year",
-                               plotlyOutput("plottotal")),
+                               plotlyOutput("plottotal", height = "100%")),
                       tabPanel(title = "By Stratified Variable",
-                               plotlyOutput("plotdist")),
+                               plotlyOutput("plotdist", height = "100%")),
                       tabPanel(title = "Variable vs. Variable",
-                               plotlyOutput("plotscatter"))),
+                               plotlyOutput("plotscatter", height = "100%"))),
             infoBoxOutput("amount_lent"),
             infoBoxOutput("repaid"),
             infoBoxOutput("defaulted"),

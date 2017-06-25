@@ -5,6 +5,7 @@ library(shinyBS)
 library(tidyverse)
 library(caret)
 library(ggfortify)
+library(plotly)
 
 
 ## Source cleaned data

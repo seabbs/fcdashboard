@@ -134,7 +134,7 @@ plot_scatter <- function(df,
 pca_on_loanbook <- function(df, no_pca = 2) {
   #' Perform pca using caret
   #' Drop variables with missing information/not true numeric variables
-  filter_loanbook <-  loanbook %>% 
+  filter_loanbook <-  df %>% 
     mutate(term = term %>% as.character %>% as.numeric) %>% 
     select(-id, 
            -next_repayment, 
