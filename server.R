@@ -3,9 +3,12 @@ library(shiny)
 library(shinydashboard)
 library(shinyBS)
 library(tidyverse)
+library(rmarkdown)
 library(caret)
 library(ggfortify)
 library(plotly)
+library(lubridate)
+library(wrapr)
 
 
 ## Source cleaned data
