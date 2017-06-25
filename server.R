@@ -3,6 +3,9 @@ library(shiny)
 library(shinydashboard)
 library(shinyBS)
 library(tidyverse)
+library(caret)
+library(ggfortify)
+
 
 ## Source cleaned data
 source("dataclean.R")
@@ -26,13 +29,16 @@ shinyServer(function(input, output) {
     summary_stats(fcloanbook())
   )
 
+  ## FC dashboard
+  
   ## Plot total lent by time
   output$plottotal <- renderPlotly(
     if (input$yaxis %in% "defaulted") {
       fcloanbook() %>% 
         filter(status %in% "defaulted") %>% 
+        mutate(defaulted = principal_remaining) %>% 
       plot_by_date( 
-                   by = "principal_remaining", 
+                   by = "defaulted", 
                    strat = input$strat_var,
                    plotly = TRUE)
     }else{
@@ -49,8 +55,9 @@ shinyServer(function(input, output) {
     if (input$yaxis %in% "defaulted") {
       fcloanbook() %>% 
         filter(status %in% "defaulted") %>% 
+        mutate(defaulted = principal_remaining) %>% 
         plot_dist( 
-          by = "principal_remaining", 
+          by = "defaulted", 
           strat = input$strat_var,
           plotly = TRUE)
     }else{
@@ -60,6 +67,15 @@ shinyServer(function(input, output) {
                    plotly = TRUE)
     }
     
+  )
+  
+  ## Plot variable scatter
+  output$plotscatter <- renderPlotly(
+plot_scatter(fcloanbook(), 
+                 by = input$yaxis, 
+                 also_by = input$com_var,
+                 strat = input$strat_var,
+                 plotly = TRUE)
   )
   
   ## Amount Lent
@@ -90,6 +106,23 @@ shinyServer(function(input, output) {
                                                 defaulted), 
             color = "black")
   )
+  
+  ##PCA
+  pca <- reactive(
+    fcloanbook() %>% 
+      pca_on_loanbook(no_pca = input$no_pca)
+  )
+  
+  ## plot pca
+  output$plotpca <- renderPlotly(
+    plot_pca(pca(), 
+             pc_1 = input$pca_1, 
+             pc_2 = input$pca_2,
+             strat = input$strat_var2, 
+             plotly = TRUE)
+  )
+  
+  ## Downloads from scripts
   ## Set up downloadable scripts
   output$downloadData0 <- downloadHandler(filename = "dataclean.R",
                                           content = function(file) {

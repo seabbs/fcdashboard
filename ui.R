@@ -4,6 +4,8 @@ library(shinydashboard)
 library(shinyBS)
 library(tidyverse)
 library(rmarkdown)
+library(caret)
+library(ggfortify)
 
 ## Source cleaned data
 source("dataclean.R")
@@ -17,9 +19,9 @@ source("fcdashboard.R")
 
 sidebar <- dashboardSidebar(
   hr(),
-  sidebarMenu(id = "tabs",
-              menuItem("Dashboard", tabName="dashboard", icon=icon("dashboard"), selected=TRUE),
-              menuItem("Exploratory Plots", tabName = "explore_plots", icon = icon("line-chart")),
+  sidebarMenu(id = "menu",
+              menuItem("Dashboard", tabName = "dashboard", icon=icon("dashboard"), selected=TRUE),
+              menuItem("PCA", tabName = "pca", icon = icon("line-chart")),
               menuItem("About", tabName = "readme", icon=icon("info")),
               menuItem("Code",  icon = icon("code"),
                        menuSubItem("Github", href = "https://github.com/seabbs/fcdashboard", icon = icon("github")),
@@ -30,39 +32,86 @@ sidebar <- dashboardSidebar(
               )
   ),
   hr(),
-  sliderInput(inputId = 'dates', 
-              label = 'Time Range',
-              min = min(loanbook$loan_accepted_date),
-              max = max(loanbook$loan_accepted_date),
-              value = range(loanbook$loan_accepted_date),
-              timeFormat="%b %Y"),
-  selectInput("yaxis", 
-              "Variable to summarise:",
-              list(`Loan amount` = 
-                     "loan_amount",
-                   Recoveries = 
-                     "recoveries",
-                   `Principal remaining` = 
-                     "principal_remaining",
-                   Defaulted = "defaulted"
-              )
-  ),
-  selectInput("strat_var", 
-              "Variable to stratify by:",
-              list(`Credit band` = 
-                     "credit_band",
-                   Status = 
-                     "status",
-                   `Loan purpose` = 
-                     "loan_purpose",
-                   Sector = "sector",
-                   Region = "region_name",
-                   `Loan term` = "term",
-                   `Whole loan` = "whole_loan",
-                   `Repayment type` = "repayment_type",
-                   `Security taken` = "security_taken"
-                   )
-  ),
+  tipify(sliderInput(inputId = 'dates', 
+                     label = 'Time Range',
+                     min = min(loanbook$loan_accepted_date),
+                     max = max(loanbook$loan_accepted_date),
+                     value = range(loanbook$loan_accepted_date),
+                     timeFormat="%b %Y"),
+         title = "Select the data range. Data out of date? Send me a tweet."),
+  conditionalPanel(condition = 'input.menu == "dashboard"',
+selectInput("yaxis", 
+                               "Variable to summarise:",
+                               list(`Loan amount` = 
+                                      "loan_amount",
+                                    Recoveries = 
+                                      "recoveries",
+                                    `Principal remaining` = 
+                                      "principal_remaining",
+                                    Defaulted = "defaulted"
+                               )
+                   ),
+                   selectInput("strat_var", 
+                               "Variable to stratify by:",
+                               list(`Credit band` = 
+                                      "credit_band",
+                                    Status = 
+                                      "status",
+                                    `Loan purpose` = 
+                                      "loan_purpose",
+                                    Sector = "sector",
+                                    Region = "region_name",
+                                    `Loan term` = "term",
+                                    `Whole loan` = "whole_loan",
+                                    `Repayment type` = "repayment_type",
+                                    `Security taken` = "security_taken"
+                               )
+                               
+                   ),
+                   selectInput("com_var", 
+                               "Variable to compare against:",
+                               list(`Interest rate` = "interest_rate",
+                                    `Loan amount` = 
+                                      "loan_amount",
+                                    Recoveries = 
+                                      "recoveries",
+                                    `Principal remaining` = 
+                                      "principal_remaining",
+                                    Defaulted = "defaulted",
+                                    `Payments remaining` = "payments_remaining",
+                                    `Term` = "term"
+                               ))),
+conditionalPanel(condition = 'input.menu == "pca"',
+                 sliderInput(inputId = "no_pca", 
+                             label = "Number of Principal components:",
+                             min = 0,
+                             max = 10,
+                             value = 2),
+                 sliderInput(inputId = "pca_1", 
+                             label = "First component to plot:",
+                             min = 0,
+                             max = 10,
+                             value = 1),
+                 sliderInput(inputId = "pca_2", 
+                             label = "First component to plot:",
+                             min = 0,
+                             max = 10,
+                             value = 2),
+                 selectInput("strat_var2", 
+                             "Variable to stratify by:",
+                             list(`Credit band` = 
+                                    "credit_band",
+                                  Status = 
+                                    "status",
+                                  `Loan purpose` = 
+                                    "loan_purpose",
+                                  Sector = "sector",
+                                  Region = "region_name",
+                                  `Loan term` = "term",
+                                  `Whole loan` = "whole_loan",
+                                  `Repayment type` = "repayment_type",
+                                  `Security taken` = "security_taken"
+                             ))),
   helpText("Developed by ", 
            a("Sam Abbott", href="http://samabbott.co.uk"), ".",
            style="padding-left:1em; padding-right:1em;position:absolute; bottom:1em; ")
@@ -83,19 +132,23 @@ body <- dashboardBody(
                       tabPanel(title = "By Year",
                                plotlyOutput("plottotal")),
                       tabPanel(title = "By Stratified Variable",
-                               plotlyOutput("plotdist"))),
+                               plotlyOutput("plotdist")),
+                      tabPanel(title = "Variable vs. Variable",
+                               plotlyOutput("plotscatter"))),
             infoBoxOutput("amount_lent"),
             infoBoxOutput("repaid"),
             infoBoxOutput("defaulted"),
             infoBoxOutput("recovered")
     )
     ),
-    tabItem(tabName = "explore_plots",
+    tabItem(tabName = "pca",
             fluidRow(
-              column(width = 4, 
-                     box(width = NULL)
-                     ),
-              column(width = 8)
+              tabBox( width = 12,
+                      title = "Principal Components",
+                      side = "right",
+                      tabPanel(title = "Scatter",
+                               plotlyOutput("plotpca", height = "100%"))
+              )
             )
             ),
     tabItem(tabName = "dataclean",
