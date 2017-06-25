@@ -36,3 +36,6 @@ loanbook <- loanbook %>%
                   )
   )
 
+## Change loan term to an ordinal factor
+loanbook <- loanbook %>% 
+  mutate(term = term %>% factor(ordered = TRUE))

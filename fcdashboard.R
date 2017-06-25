@@ -61,6 +61,35 @@ wrapr::let(
  }
 }
 
+#' violin plot of data
+plot_dist <- function(df, 
+          by = "loan_amount",
+          strat = "credit_band",
+          plotly = TRUE)
+wrapr::let(
+  list(X = by, Y = strat), {
+    df <- df %>% 
+      mutate(`Amount (Thousands)` = X / 1e3)
+    
+   p <- df %>% 
+      ggplot(aes(x = Y, y = `Amount (Thousands)`, fill = Y)) +
+      geom_violin() +
+      theme_minimal()
+    
+    if (plotly) {
+      ggplotly(p) %>%
+        plotly:: layout(autosize = TRUE)
+    }else {
+      p
+    }
+  }
+)
+#' Convert million
+convert_million <- function(x, label = "M") {
+x <- round(x / 1e6, 1) 
+x <- format(x, big.mark = ",")
+x <- paste0(x, label)
+}
 
 #' Return with per
 return_with_per <- function(df, num, denom) {

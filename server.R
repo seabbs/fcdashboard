@@ -17,7 +17,8 @@ shinyServer(function(input, output) {
 
   ## Filter data
   fcloanbook <- reactive(
-    loanbook
+    loanbook %>% filter(loan_accepted_date >= input$dates[1],
+                        loan_accepted_date <= input$dates[2])
   )
   
   ##Summary stats
@@ -25,37 +26,69 @@ shinyServer(function(input, output) {
     summary_stats(fcloanbook())
   )
 
-  ## Plot total lent
+  ## Plot total lent by time
   output$plottotal <- renderPlotly(
-    plot_by_date(fcloanbook(), 
-                             by = "loan_amount", 
-                             strat = "credit_band",
-                             plotly = TRUE)
+    if (input$yaxis %in% "defaulted") {
+      fcloanbook() %>% 
+        filter(status %in% "defaulted") %>% 
+      plot_by_date( 
+                   by = "principal_remaining", 
+                   strat = input$strat_var,
+                   plotly = TRUE)
+    }else{
+      plot_by_date(fcloanbook(), 
+                   by = input$yaxis, 
+                   strat = input$strat_var,
+                   plotly = TRUE)
+    }
+
+  )
+  
+  ## Plot amount as violin
+  output$plotdist <- renderPlotly(
+    if (input$yaxis %in% "defaulted") {
+      fcloanbook() %>% 
+        filter(status %in% "defaulted") %>% 
+        plot_dist( 
+          by = "principal_remaining", 
+          strat = input$strat_var,
+          plotly = TRUE)
+    }else{
+      plot_dist(fcloanbook(), 
+                   by = input$yaxis, 
+                   strat = input$strat_var,
+                   plotly = TRUE)
+    }
+    
   )
   
   ## Amount Lent
   output$amount_lent <- renderInfoBox(
     infoBox("Amount Lent", sumstats() %>% 
               select(amount_lent) %>% 
-      convert_million)
+      convert_million,
+      color = "black")
   )
   
   ## Amount repaid
   output$repaid <- renderInfoBox(
     infoBox("Amount Repaid", return_with_per(sumstats(), principal_repaid,
-                                                amount_lent))
+                                                amount_lent),
+            color = "black")
   )
   
   ## Amount defaulted
   output$defaulted <- renderInfoBox(
     infoBox("Amount Defaulted", return_with_per(sumstats(), defaulted,
-                                                amount_lent))
+                                                amount_lent),
+            color = "black")
   )
   
   ## Amount recovered
   output$recovered <- renderInfoBox(
     infoBox("Amount Recovered", return_with_per(sumstats(), recoveries,
-                                                defaulted))
+                                                defaulted), 
+            color = "black")
   )
   ## Set up downloadable scripts
   output$downloadData0 <- downloadHandler(filename = "dataclean.R",

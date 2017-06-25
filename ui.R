@@ -5,6 +5,12 @@ library(shinyBS)
 library(tidyverse)
 library(rmarkdown)
 
+## Source cleaned data
+source("dataclean.R")
+
+## Source functions 
+source("fcdashboard.R")
+
 ## Slider in menu bar to control dates of data shown
 ## Buttons showing summary data at bottom
 ## two summary graphs in main dashboard
@@ -24,6 +30,39 @@ sidebar <- dashboardSidebar(
               )
   ),
   hr(),
+  sliderInput(inputId = 'dates', 
+              label = 'Time Range',
+              min = min(loanbook$loan_accepted_date),
+              max = max(loanbook$loan_accepted_date),
+              value = range(loanbook$loan_accepted_date),
+              timeFormat="%b %Y"),
+  selectInput("yaxis", 
+              "Variable to summarise:",
+              list(`Loan amount` = 
+                     "loan_amount",
+                   Recoveries = 
+                     "recoveries",
+                   `Principal remaining` = 
+                     "principal_remaining",
+                   Defaulted = "defaulted"
+              )
+  ),
+  selectInput("strat_var", 
+              "Variable to stratify by:",
+              list(`Credit band` = 
+                     "credit_band",
+                   Status = 
+                     "status",
+                   `Loan purpose` = 
+                     "loan_purpose",
+                   Sector = "sector",
+                   Region = "region_name",
+                   `Loan term` = "term",
+                   `Whole loan` = "whole_loan",
+                   `Repayment type` = "repayment_type",
+                   `Security taken` = "security_taken"
+                   )
+  ),
   helpText("Developed by ", 
            a("Sam Abbott", href="http://samabbott.co.uk"), ".",
            style="padding-left:1em; padding-right:1em;position:absolute; bottom:1em; ")
@@ -38,12 +77,18 @@ body <- dashboardBody(
     tabItem(tabName = "dashboard",
             fluidRow(
               tags$head(includeScript("google-analytics.js")),
-                     box(width = 12,
-                         plotlyOutput("plottotal"))),
+              tabBox( width = 12,
+                      title = "Summary Plots",
+                      side = "right",
+                      tabPanel(title = "By Year",
+                               plotlyOutput("plottotal")),
+                      tabPanel(title = "By Stratified Variable",
+                               plotlyOutput("plotdist"))),
             infoBoxOutput("amount_lent"),
             infoBoxOutput("repaid"),
             infoBoxOutput("defaulted"),
             infoBoxOutput("recovered")
+    )
     ),
     tabItem(tabName = "explore_plots",
             fluidRow(
