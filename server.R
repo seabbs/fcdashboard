@@ -19,6 +19,11 @@ shinyServer(function(input, output) {
   fcloanbook <- reactive(
     loanbook
   )
+  
+  ##Summary stats
+  sumstats <- reactive(
+    summary_stats(fcloanbook())
+  )
 
   ## Plot total lent
   output$plottotal <- renderPlotly(
@@ -26,6 +31,31 @@ shinyServer(function(input, output) {
                              by = "loan_amount", 
                              strat = "credit_band",
                              plotly = TRUE)
+  )
+  
+  ## Amount Lent
+  output$amount_lent <- renderInfoBox(
+    infoBox("Amount Lent", sumstats() %>% 
+              select(amount_lent) %>% 
+      convert_million)
+  )
+  
+  ## Amount repaid
+  output$repaid <- renderInfoBox(
+    infoBox("Amount Repaid", return_with_per(sumstats(), principal_repaid,
+                                                amount_lent))
+  )
+  
+  ## Amount defaulted
+  output$defaulted <- renderInfoBox(
+    infoBox("Amount Defaulted", return_with_per(sumstats(), defaulted,
+                                                amount_lent))
+  )
+  
+  ## Amount recovered
+  output$recovered <- renderInfoBox(
+    infoBox("Amount Recovered", return_with_per(sumstats(), recoveries,
+                                                defaulted))
   )
   ## Set up downloadable scripts
   output$downloadData0 <- downloadHandler(filename = "dataclean.R",

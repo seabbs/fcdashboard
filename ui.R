@@ -38,13 +38,12 @@ body <- dashboardBody(
     tabItem(tabName = "dashboard",
             fluidRow(
               tags$head(includeScript("google-analytics.js")),
-              column(width = 4, 
-                     box(width = NULL,
+                     box(width = 12,
                          plotlyOutput("plottotal"))),
-              column(width = 8,
-                     box(width = NULL)
-                     )
-            )
+            infoBoxOutput("amount_lent"),
+            infoBoxOutput("repaid"),
+            infoBoxOutput("defaulted"),
+            infoBoxOutput("recovered")
     ),
     tabItem(tabName = "explore_plots",
             fluidRow(
