@@ -17,6 +17,7 @@
 #' - contains the amount for each loan part. could own the same loan with parts of different amounts
 #' - no additional information on how much loans are for sale for etc
 #' 
+#' Data upload button option, for testing have data in local repo (remove when uploaded to server)
 #' 
 #' Data munging:
 #' - Load data
