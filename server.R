@@ -112,17 +112,31 @@ plot_scatter(fcloanbook(),
   )
   
   ##PCA
-  pca <- reactive(
+  fc_pca <- reactive(
     fcloanbook() %>% 
-      pca_on_loanbook(no_pca = input$no_pca)
+      pca_on_loanbook(no_pca = input$fc_no_pca)
+  )
+  
+  p_pca <- reactive(
+    fcloanbook() %>% 
+      pca_on_loanbook(no_pca = input$p_no_pca)
   )
   
   ## plot pca
-  output$plotpca <- renderPlotly(
-    plot_pca(pca(), 
-             pc_1 = input$pca_1, 
-             pc_2 = input$pca_2,
-             strat = input$strat_var2, 
+  output$plot_fc_pca <- renderPlotly(
+    plot_pca(fc_pca(), 
+             pc_1 = input$fc_pca_1, 
+             pc_2 = input$fc_pca_2,
+             strat = input$fc_strat_var2, 
+             plotly = TRUE)
+  )
+  
+  ## plot pca
+  output$plot_p_pca <- renderPlotly(
+    plot_pca(p_pca(), 
+             pc_1 = input$p_pca_1, 
+             pc_2 = input$p_pca_2,
+             strat = input$p_strat_var2, 
              plotly = TRUE)
   )
   
