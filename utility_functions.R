@@ -4,14 +4,6 @@ library(plotly)
 library(lubridate)
 library(wrapr)
 
-#' Load cleaned data
-source("dataclean.R")
-
-#' Set up buttons for total loanbook funding all time
-#' Current loanbook funding
-#' Amount in defaulted loans
-#' Default loads recovered
-#' 
 
 #' Summary statistics
 summary_stats <- function(df) { 
@@ -22,7 +14,7 @@ summary_stats <- function(df) {
               defaulted = principal_remaining %>%
                 replace(!status %in% "defaulted", NA) %>% 
                 sum(na.rm = TRUE)
-              ) 
+    ) 
 }
 
 #' Plot amount lent
@@ -30,71 +22,72 @@ plot_by_date <- function(df,
                          by = "loan_amount", 
                          strat = "credit_band",
                          plotly = TRUE) {
-wrapr::let(
-  list(X = by, Y = strat), {
-    df <- df %>% 
-      mutate(`Loan Acceptance (by month)` = 
-               lubridate::round_date(loan_accepted_date, unit = "month"),
-             Year = lubridate::year(loan_accepted_date)) %>% 
-      dplyr::group_by(`Loan Acceptance (by month)`, Y, Year)  %>% 
-      dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
-      na.omit
-    
-    p <- df %>% 
-      ggplot(aes(x = `Loan Acceptance (by month)`,
-                 y = X, 
-                 colour = Y)) +
-      ylab(paste0(by, " (£, Millions)")) +
-      geom_point() +
-      geom_line() +
-      theme_minimal() +
-      theme(legend.position = "bottom")
+  wrapr::let(
+    list(X = by, Y = strat), {
+      df <- df %>% 
+        mutate(`Loan Acceptance (by month)` = 
+                 lubridate::round_date(loan_accepted_date, unit = "month"),
+               Year = lubridate::year(loan_accepted_date)) %>% 
+        dplyr::group_by(`Loan Acceptance (by month)`, Y, Year)  %>% 
+        dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
+        na.omit
+      
+      p <- df %>% 
+        ggplot(aes(x = `Loan Acceptance (by month)`,
+                   y = X, 
+                   colour = Y)) +
+        ylab(paste0(by, " (£, Millions)")) +
+        geom_point() +
+        geom_line() +
+        theme_minimal() +
+        theme(legend.position = "bottom")
+    }
+  )
+  
+  
+  
+  if (plotly) {
+    ggplotly(p) %>%
+      plotly:: layout(autosize = TRUE)
+  }else {
+    p
   }
-)
-
-
- 
- if (plotly) {
-   ggplotly(p) %>%
-     plotly:: layout(autosize = TRUE)
- }else {
-   p
- }
 }
 
 #' violin plot of data
 plot_dist <- function(df, 
-          by = "loan_amount",
-          strat = "credit_band",
-          plotly = TRUE)
-wrapr::let(
-  list(X = by, Y = strat), {
-    df <- df %>% 
-      mutate(X = X / 1e3)
-    
-   p <- df %>% 
-      ggplot(aes(x = Y, y = X, fill = Y)) +
-      geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
-      ylab(paste0(by, " (£, Thousands)")) +
-      theme_minimal() +
-      theme(axis.text.x=element_text(angle=45,hjust=1),
-            legend.position = "none")
-    
-    if (plotly) {
-      ggplotly(p) %>%
-        plotly:: layout(autosize = TRUE)
-    }else {
-      p
+                      by = "loan_amount",
+                      strat = "credit_band",
+                      plotly = TRUE)
+  wrapr::let(
+    list(X = by, Y = strat), {
+      df <- df %>% 
+        mutate(X = X / 1e3)
+      
+      p <- df %>% 
+        ggplot(aes(x = Y, y = X, fill = Y)) +
+        geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+        ylab(paste0(by, " (£, Thousands)")) +
+        theme_minimal() +
+        theme(axis.text.x=element_text(angle=45,hjust=1),
+              legend.position = "none")
+      
+      if (plotly) {
+        ggplotly(p) %>%
+          plotly:: layout(autosize = TRUE)
+      }else {
+        p
+      }
     }
-  }
-)
+  )
 
 #' scatter of 2 numeric variables
 plot_scatter <- function(df, 
-                      by = "loan_amount",
-                      also_by = "term",
-                      strat = "credit_band",
-                      plotly = TRUE) {
+                         by = "loan_amount",
+                         also_by = "term",
+                         strat = "credit_band",
+                         plotly = TRUE,
+                         alpha = 0.4) {
   if(also_by %in% "term") {
     df <- df %>% 
       mutate(term = term %>% 
@@ -115,7 +108,7 @@ plot_scatter <- function(df,
       p <- df %>%
         mutate(X = X/1e3) %>% 
         ggplot(aes(x = X, y = Z, colour = Y)) +
-        geom_point(alpha = 0.2) +
+        geom_count(alpha = alpha, show.legend = TRUE) +
         xlab(paste0(by, " (£, Thousands)")) +
         theme_minimal()
       
@@ -163,13 +156,14 @@ plot_pca <- function(df_list,
                      pc_1 = 1, 
                      pc_2 = 2,
                      strat, 
-                     plotly = TRUE) {
+                     plotly = TRUE,
+                     alpha = 0.2) {
   p <- autoplot(df_list[[1]], 
                 x = pc_1,
                 y = pc_2, 
                 data = df_list[[2]],
                 colour = strat,
-                alpha = 0.2,
+                alpha = alpha,
                 loadings = TRUE,
                 loadings.colour = "black",
                 loadings.label = TRUE,
@@ -186,9 +180,9 @@ plot_pca <- function(df_list,
 
 #' Convert million
 convert_million <- function(x, label = "M") {
-x <- round(x / 1e6, 1) 
-x <- format(x, big.mark = ",")
-x <- paste0(x, label)
+  x <- round(x / 1e6, 1) 
+  x <- format(x, big.mark = ",")
+  x <- paste0(x, label)
 }
 
 #' Return with per

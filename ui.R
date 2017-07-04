@@ -11,10 +11,13 @@ library(lubridate)
 library(wrapr)
 
 ## Source cleaned data
-source("dataclean.R")
+source("clean_fc_loanbook.R")
 
-## Source functions 
-source("fcdashboard.R")
+## Source utility functions
+source("utility_functions.R")
+
+## Source functions for personal loanbook
+source("personal_loanbook.R")
 
 ## Slider in menu bar to control dates of data shown
 ## Buttons showing summary data at bottom
@@ -35,8 +38,9 @@ sidebar <- dashboardSidebar(
               menuItem("About", tabName = "readme", icon=icon("info"), selected = TRUE),
               menuItem("Code",  icon = icon("code"),
                        menuSubItem("Github", href = "https://github.com/seabbs/fcdashboard", icon = icon("github")),
-                       menuSubItem("dataclean.R", tabName = "dataclean", icon = icon("angle-right")),
-                       menuSubItem("fcdashboard.R", tabName = "fcdashboard", icon = icon("angle-right")),
+                       menuSubItem("clean_fc_loanbook.R", tabName = "dataclean", icon = icon("angle-right")),
+                       menuSubItem("utility_functions.R", tabName = "utility_functions", icon = icon("angle-right")),
+                       menuSubItem("personal_loanbook.R", tabName = "personal_loanbook", icon = icon("angle-right")),
                        menuSubItem("ui.R", tabName = "ui", icon = icon("angle-right")),
                        menuSubItem("server.R", tabName = "server", icon = icon("angle-right"))
               )
@@ -264,29 +268,36 @@ body <- dashboardBody(
           )
   ),
     tabItem(tabName = "dataclean",
-            box( width = NULL, status = "primary", solidHeader = TRUE, title="Data Cleaning",                
+            box( width = NULL, status = "primary", solidHeader = TRUE, title="Data Cleaning of FC Loanbook",                
                  downloadButton('downloadData0', 'Download'),
                  br(),br(),
-                 pre(includeText("dataclean.R"))
+                 pre(includeText("clean_fc_loanbook.R"))
             )
     ),
-    tabItem(tabName = "fcdashboard",
-            box( width = NULL, status = "primary", solidHeader = TRUE, title="Functions",                
+    tabItem(tabName = "utility_functions",
+            box( width = NULL, status = "primary", solidHeader = TRUE, title="Utility Functions",                
                  downloadButton('downloadData1', 'Download'),
                  br(),br(),
-                 pre(includeText("fcdashboard.R"))
+                 pre(includeText("utility_functions.R"))
             )
     ),
+  tabItem(tabName = "personal_loanbook",
+          box( width = NULL, status = "primary", solidHeader = TRUE, title="Personal Loanbook Functions",                
+               downloadButton('downloadData2', 'Download'),
+               br(),br(),
+               pre(includeText("personal_loanbook.R"))
+          )
+  ),
     tabItem(tabName = "ui",
             box( width = NULL, status = "primary", solidHeader = TRUE, title="UI",
-                 downloadButton('downloadData2', 'Download'),
+                 downloadButton('downloadData3', 'Download'),
                  br(),br(),
                  pre(includeText("ui.R"))
             )
     ),
     tabItem(tabName = "server",
             box( width = NULL, status = "primary", solidHeader = TRUE, title="Server",
-                 downloadButton('downloadData3', 'Download'),
+                 downloadButton('downloadData4', 'Download'),
                  br(),br(),
                  pre(includeText("server.R"))
             )

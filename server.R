@@ -12,10 +12,10 @@ library(wrapr)
 
 
 ## Source cleaned data
-source("dataclean.R")
+source("clean_fc_loanbook.R")
 
-## Source functions for fc loanbook
-source("fcdashboard.R")
+## Source utility functions
+source("utility_functions.R")
 
 ## Source functions for personal loanbook
 source("personal_loanbook.R")
@@ -146,7 +146,8 @@ plot_scatter(fc_loanbook(),
                  by = input$p_yaxis, 
                  also_by = input$p_com_var,
                  strat = input$p_strat_var,
-                 plotly = TRUE)
+                 plotly = TRUE,
+                 alpha = 0.8)
   )
   
   ## Amount Lent
@@ -230,27 +231,33 @@ plot_scatter(fc_loanbook(),
              pc_1 = input$p_pca_1, 
              pc_2 = input$p_pca_2,
              strat = input$p_strat_var2, 
-             plotly = TRUE)
+             plotly = TRUE,
+             alpha = 0.8)
   )
   
   ## Downloads from scripts
   ## Set up downloadable scripts
-  output$downloadData0 <- downloadHandler(filename = "dataclean.R",
+  output$downloadData0 <- downloadHandler(filename = "clean_fc_loanbook.R",
                                           content = function(file) {
-                                            file.copy("dataclean.R", file, overwrite = TRUE)
+                                            file.copy("clean_fc_loanbook.R", file, overwrite = TRUE)
                                           }
   )
-  output$downloadData1 <- downloadHandler(filename = "fcdashboard.R",
+  output$downloadData1 <- downloadHandler(filename = "utility_functions.R",
                                           content = function(file) {
-                                            file.copy("fcdashboard.R", file, overwrite = TRUE)
+                                            file.copy("utility_functions.R", file, overwrite = TRUE)
                                             }
                                           )
-  output$downloadData2 <- downloadHandler(filename = "ui.R",
+  output$downloadData2 <- downloadHandler(filename = "personal_loanbook.R",
+                                          content = function(file) {
+                                            file.copy("personal_loanbook.R", file, overwrite = TRUE)
+                                          }
+  )
+  output$downloadData3 <- downloadHandler(filename = "ui.R",
                                           content = function(file) {
                                             file.copy("ui.R", file, overwrite = TRUE)
                                             }
                                           )
-  output$downloadData3 <- downloadHandler(filename = "server.R",
+  output$downloadData4 <- downloadHandler(filename = "server.R",
                                           content = function(file) {
                                             file.copy("server.R", file, overwrite = TRUE)
                                             }
