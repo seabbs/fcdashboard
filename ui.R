@@ -29,6 +29,7 @@ sidebar <- dashboardSidebar(
                        ),
               menuItem("Personal Dashboard", icon = icon("dashboard"),
                        menuSubItem("Dashboard", tabName = "p_dashboard", icon=icon("dashboard")),
+                       menuSubItem("Exploratory Plots", tabName = "p_exploratory", icon=icon("line-chart")),
                        menuSubItem("PCA", tabName = "p_pca", icon = icon("line-chart"))
               ),
               menuItem("About", tabName = "readme", icon=icon("info"), selected = TRUE),
@@ -49,7 +50,7 @@ sidebar <- dashboardSidebar(
                      timeFormat="%b %Y"),
          title = "Select the data range. Data out of date? Send me a tweet."),
   conditionalPanel(condition = 'input.menu == "fc_dashboard"',
-selectInput("yaxis", 
+selectInput("fc_yaxis", 
                                "Variable to summarise:",
                                list(`Loan amount` = 
                                       "loan_amount",
@@ -60,7 +61,7 @@ selectInput("yaxis",
                                     Defaulted = "defaulted"
                                )
                    ),
-                   selectInput("strat_var", 
+                   selectInput("fc_strat_var", 
                                "Variable to stratify by:",
                                list(`Credit band` = 
                                       "credit_band",
@@ -77,7 +78,7 @@ selectInput("yaxis",
                                )
                                
                    ),
-                   selectInput("com_var", 
+                   selectInput("fc_com_var", 
                                "Variable to compare against:",
                                list(`Interest rate` = "interest_rate",
                                     `Loan amount` = 
@@ -90,6 +91,48 @@ selectInput("yaxis",
                                     `Payments remaining` = "payments_remaining",
                                     `Term` = "term"
                                ))),
+conditionalPanel(condition = 'input.menu == "p_exploratory"',
+                 selectInput("p_yaxis", 
+                             "Variable to summarise:",
+                             list(`Loan amount` = 
+                                    "loan_amount",
+                                  Recoveries = 
+                                    "recoveries",
+                                  `Principal remaining` = 
+                                    "principal_remaining",
+                                  Defaulted = "defaulted"
+                             )
+                 ),
+                 selectInput("p_strat_var", 
+                             "Variable to stratify by:",
+                             list(`Credit band` = 
+                                    "credit_band",
+                                  Status = 
+                                    "status",
+                                  `Loan purpose` = 
+                                    "loan_purpose",
+                                  Sector = "sector",
+                                  Region = "region_name",
+                                  `Loan term` = "term",
+                                  `Whole loan` = "whole_loan",
+                                  `Repayment type` = "repayment_type",
+                                  `Security taken` = "security_taken"
+                             )
+                             
+                 ),
+                 selectInput("p_com_var", 
+                             "Variable to compare against:",
+                             list(`Interest rate` = "interest_rate",
+                                  `Loan amount` = 
+                                    "loan_amount",
+                                  Recoveries = 
+                                    "recoveries",
+                                  `Principal remaining` = 
+                                    "principal_remaining",
+                                  Defaulted = "defaulted",
+                                  `Payments remaining` = "payments_remaining",
+                                  `Term` = "term"
+                             ))),
 conditionalPanel(condition = 'input.menu == "fc_pca"',
                  sliderInput(inputId = "fc_no_pca", 
                              label = "Number of Principal components:",
@@ -121,6 +164,7 @@ conditionalPanel(condition = 'input.menu == "fc_pca"',
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken"
                              ))),
+
 conditionalPanel(condition = 'input.menu == "p_pca"',
                  sliderInput(inputId = "p_no_pca", 
                              label = "Number of Principal components:",
@@ -170,16 +214,34 @@ body <- dashboardBody(
                       title = "Summary Plots",
                       side = "right",
                       tabPanel(title = "By Year",
-                               plotlyOutput("plottotal", height = "200%")),
+                               plotlyOutput("fc_plottotal", height = "200%")),
                       tabPanel(title = "By Stratified Variable",
-                               plotlyOutput("plotdist", height = "200%")),
+                               plotlyOutput("fc_plotdist", height = "200%")),
                       tabPanel(title = "Variable vs. Variable",
-                               plotlyOutput("plotscatter", height = "200%"))),
-            infoBoxOutput("amount_lent"),
-            infoBoxOutput("repaid"),
-            infoBoxOutput("defaulted"),
-            infoBoxOutput("recovered")
+                               plotlyOutput("fc_plotscatter", height = "200%"))),
+            infoBoxOutput("fc_amount_lent"),
+            infoBoxOutput("fc_repaid"),
+            infoBoxOutput("fc_defaulted"),
+            infoBoxOutput("fc_recovered")
     )
+    ),
+    tabItem(tabName = "p_exploratory",
+            fluidRow(
+              tags$head(includeScript("google-analytics.js")),
+              tabBox( width = 12,
+                      title = "Summary Plots",
+                      side = "right",
+                      tabPanel(title = "By Year",
+                               plotlyOutput("p_plottotal", height = "200%")),
+                      tabPanel(title = "By Stratified Variable",
+                               plotlyOutput("p_plotdist", height = "200%")),
+                      tabPanel(title = "Variable vs. Variable",
+                               plotlyOutput("p_plotscatter", height = "200%"))),
+              infoBoxOutput("p_amount_lent"),
+              infoBoxOutput("p_repaid"),
+              infoBoxOutput("p_defaulted"),
+              infoBoxOutput("p_recovered")
+            )
     ),
     tabItem(tabName = "fc_pca",
             fluidRow(
