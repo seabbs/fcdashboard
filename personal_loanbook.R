@@ -1,6 +1,5 @@
 library(tidyverse)
 
-source("dataclean.R")
 #' Dataset by loan
 #' Data set contains:
 #' - the number of loan parts owned
@@ -47,19 +46,25 @@ source("dataclean.R")
 #'   - Sub tab PCA your data set main dataset
 #'   - Bad debt interest by number of loans and sample from loanbook, add option to sample based on your distribution
 
-
 personal_loanbook <- read_csv("personal_loanbook.csv")
+
+
 
 bind_loanbooks <- function(personal_loanbook, fc_loanbook, verbose= TRUE) {
   personal_loanbook <- personal_loanbook %>% 
-  rename(id = `Loan ID`)
+  rename(id = `Loan ID`) %>%
+    mutate(invested_in = "Yes")
 
 combined_loanbook <- fc_loanbook %>% 
-  full_join(personal_loanbook)
+  full_join(personal_loanbook) %>% 
+  mutate(invested_in = invested_in %>% replace(is.na(invested_in), "No"))
 
 if (verbose) {
   loans_without_data <- is.na(combined_loanbook$credit_band) %>% sum
-  message("Loan books are bound with ", loans_without_data, " missing loan entries. Considering uploading an updated funding circle loan book")
+  message("Loan books are bound with ", loans_without_data, " missing loan entries.")
+  if (loans_without_data > 1) {
+    message("Consider uploading an updated funding circle loan book as some of your loans are missing data")
+  }
 }
 return(combined_loanbook)
 }
