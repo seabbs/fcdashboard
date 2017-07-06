@@ -21,7 +21,7 @@ source("utility_functions.R")
 source("personal_loanbook.R")
 
 ## Stop spurious warnings
-options(warn = - 1)
+options(warn = -1)
 
 shinyServer(function(input, output) {
 
@@ -33,7 +33,7 @@ shinyServer(function(input, output) {
   
   combined_loanbook <- reactive(
     personal_loanbook %>%
-      bind_loanbooks(loanbook, verbose= TRUE)  %>% 
+      bind_loanbooks(loanbook, verbose = TRUE)  %>% 
       filter(loan_accepted_date >= input$dates[1],
              loan_accepted_date <= input$dates[2])
   )
@@ -41,6 +41,19 @@ shinyServer(function(input, output) {
   p_loanbook <- reactive(
     combined_loanbook() %>% 
       filter(invested_in %in% "Yes")
+  )
+  
+  cleaned_p_loanbook <- reactive(
+    p_loanbook() %>% 
+      rename(`Loan ID` = id) %>% 
+      rename( Region = region_name,
+             `Repayment type` = repayment_type,
+             `Security taken` = security_taken,
+             `Loan term` = term) %>% 
+      select(`Loan ID`, `Loan title`, `Sector`,
+             `Number of loan parts`, Risk, `Repayments left`,
+             `Principal remaining`, Rate, `Next payment date`, 
+             `Loan status`, `Loan term`, Region, `Repayment type`, `Security taken`)
   )
   
   
@@ -53,13 +66,6 @@ shinyServer(function(input, output) {
   p_sumstats <- reactive(
     summary_stats(p_loanbook())
   )
-  
-  ## Personal Dashboard
-  
-  output$p_loanbook_table <- renderDataTable(
-    personal_loanbook
-  )
-  
   
   ## Exploratory plots
   
@@ -240,6 +246,22 @@ plot_scatter(fc_loanbook(),
              plotly = TRUE,
              alpha = 0.8)
   )
+  
+  ## Personal Dashboard
+  
+  ## Raw data table
+  output$p_loanbook_table <- renderDataTable(
+    cleaned_p_loanbook(),
+    options = list(
+      pageLength = 5)
+  )
+  
+  ## Summarised data table
+  output$p_loanbook_sum_table <- renderDataTable(
+    cleaned_p_loanbook() %>% 
+      p_loanbook_sum_table(strat = input$p_dash_strat)
+  )
+  
   
   ## Downloads from scripts
   ## Set up downloadable scripts

@@ -1,4 +1,5 @@
 library(tidyverse)
+library(wrapr)
 
 #' Dataset by loan
 #' Data set contains:
@@ -57,7 +58,7 @@ bind_loanbooks <- function(personal_loanbook, fc_loanbook, verbose= TRUE) {
 
 combined_loanbook <- fc_loanbook %>% 
   full_join(personal_loanbook) %>% 
-  mutate(invested_in = invested_in %>% replace(is.na(invested_in), "No"))
+  mutate(invested_in = invested_in %>% replace(is.na(invested_in), "No")) 
 
 if (verbose) {
   loans_without_data <- is.na(combined_loanbook$credit_band) %>% sum
@@ -69,3 +70,21 @@ if (verbose) {
 return(combined_loanbook)
 }
 
+## Summary table stratified by stratification variable
+p_loanbook_sum_table <- function(df, strat) {
+  ## Total amount lent
+  total_amount_lent <- sum(df$`Principal remaining`)
+  
+  ##Summarise loanbook
+  wrapr::let(
+    list(X = strat), {
+      df_sum <- df %>% 
+        group_by(X) %>% 
+        summarise(`Amount lent` = sum(`Principal remaining`),
+                  `Number of loan parts` = sum(`Number of loan parts`),
+                  `Percentage of loanbook` = round(`Amount lent` / total_amount_lent * 100, digits = 1)
+        )
+    }
+  )
+  return(df_sum)
+}

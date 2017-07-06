@@ -200,9 +200,25 @@ conditionalPanel(condition = 'input.menu == "p_pca"',
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken"
                              ))),
+conditionalPanel(condition = 'input.menu == "p_dashboard"',
+                 selectInput("p_dash_strat", 
+                             "Variable to stratify by:",
+                             list(Risk = 
+                                    "Risk",
+                                  `Loan title` = 
+                                    "`Loan title`",
+                                  Sector = "`Sector`",
+                                  `Next payment date` = 
+                                    "`Next payment date`",
+                                  `Loan status` = "`Loan status`",
+                                  Region = "`Region`",
+                                  `Loan term` = "`Loan term`",
+                                  `Repayment type` = "`Repayment type`",
+                                  `Security taken` = "`Security taken`"
+                             ))),
   helpText("Developed by ", 
-           a("Sam Abbott", href="http://samabbott.co.uk"), ".",
-           style="padding-left:1em; padding-right:1em;position:absolute; bottom:1em; ")
+           a("Sam Abbott", href = "http://samabbott.co.uk"), ".",
+           style = "padding-left:1em; padding-right:1em;position:absolute; bottom:1em; ")
 )
 
 body <- dashboardBody(
@@ -237,7 +253,9 @@ body <- dashboardBody(
                              side = "right",
                              tabPanel(title = "Personal Loanbook",
                                       dataTableOutput("p_loanbook_table")
-                             )
+                             ),
+                             tabPanel(title = "Summary Table",
+                                      dataTableOutput("p_loanbook_sum_table"))
                              )
               )
             )
