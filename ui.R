@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
+library(DT)
 library(tidyverse)
 library(rmarkdown)
 library(caret)
@@ -26,15 +27,15 @@ source("personal_loanbook.R")
 sidebar <- dashboardSidebar(
   hr(),
   sidebarMenu(id = "menu",
-              menuItem("FC Dashboard", icon = icon("dashboard"),
-                       menuSubItem("Dashboard", tabName = "fc_dashboard", icon=icon("dashboard")),
-                       menuSubItem("PCA", tabName = "fc_pca", icon = icon("line-chart"))
-                       ),
               menuItem("Personal Dashboard", icon = icon("dashboard"),
                        menuSubItem("Dashboard", tabName = "p_dashboard", icon=icon("dashboard")),
                        menuSubItem("Exploratory Plots", tabName = "p_exploratory", icon=icon("line-chart")),
                        menuSubItem("PCA", tabName = "p_pca", icon = icon("line-chart"))
               ),
+              menuItem("FC Dashboard", icon = icon("dashboard"),
+                       menuSubItem("Dashboard", tabName = "fc_dashboard", icon=icon("dashboard")),
+                       menuSubItem("PCA", tabName = "fc_pca", icon = icon("line-chart"))
+                       ),
               menuItem("About", tabName = "readme", icon=icon("info"), selected = TRUE),
               menuItem("Code",  icon = icon("code"),
                        menuSubItem("Github", href = "https://github.com/seabbs/fcdashboard", icon = icon("github")),
@@ -205,13 +206,13 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                              "Variable to stratify by:",
                              list(Risk = 
                                     "Risk",
-                                  `Loan title` = 
-                                    "`Loan title`",
+                                  `Loan purpose` = 
+                                    "`Loan purpose`",
                                   Sector = "`Sector`",
                                   `Next payment date` = 
                                     "`Next payment date`",
                                   `Loan status` = "`Loan status`",
-                                  Region = "`Region`",
+                                  Region = "Region",
                                   `Loan term` = "`Loan term`",
                                   `Repayment type` = "`Repayment type`",
                                   `Security taken` = "`Security taken`"
@@ -251,13 +252,24 @@ body <- dashboardBody(
                      tabBox( width = NULL,
                              title = "Summary Tables",
                              side = "right",
-                             tabPanel(title = "Personal Loanbook",
-                                      dataTableOutput("p_loanbook_table")
-                             ),
                              tabPanel(title = "Summary Table",
-                                      dataTableOutput("p_loanbook_sum_table"))
-                             )
+                                      DT::dataTableOutput("p_loanbook_sum_table")),
+                             tabPanel(title = "Loanbook",
+                                      DT::dataTableOutput("p_loanbook_table", width = "auto")
+                             ))
+              ),
+              column(width = 6,
+                     tabBox( width = NULL,
+                             title = "Summary Plots",
+                             side = "right",
+                             tabPanel(title = "Amount lent (£)",
+                                      plotlyOutput("p_loanbook_sum_plot_amount", height = "200%")),
+                             tabPanel(title = "No. of loan parts",
+                                      plotlyOutput("p_loanbook_sum_plot_no", height = "200%")),
+                             tabPanel(title = "Percentage of loanbook (%)",
+                                      plotlyOutput("p_loanbook_sum_plot_per", height = "200%"))
               )
+            )
             )
     ),
     tabItem(tabName = "p_exploratory",

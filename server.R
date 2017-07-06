@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
+library(DT)
 library(tidyverse)
 library(rmarkdown)
 library(caret)
@@ -49,11 +50,13 @@ shinyServer(function(input, output) {
       rename( Region = region_name,
              `Repayment type` = repayment_type,
              `Security taken` = security_taken,
-             `Loan term` = term) %>% 
+             `Loan term` = term,
+             `Loan purpose` = loan_purpose) %>% 
       select(`Loan ID`, `Loan title`, `Sector`,
              `Number of loan parts`, Risk, `Repayments left`,
              `Principal remaining`, Rate, `Next payment date`, 
-             `Loan status`, `Loan term`, Region, `Repayment type`, `Security taken`)
+             `Loan status`, `Loan term`, `Loan purpose`,
+             Region, `Repayment type`, `Security taken`)
   )
   
   
@@ -250,19 +253,50 @@ plot_scatter(fc_loanbook(),
   ## Personal Dashboard
   
   ## Raw data table
-  output$p_loanbook_table <- renderDataTable(
+  output$p_loanbook_table <- DT::renderDataTable(
     cleaned_p_loanbook(),
     options = list(
-      pageLength = 5)
+      pageLength = 5,
+      scrollX = TRUE)
   )
   
-  ## Summarised data table
-  output$p_loanbook_sum_table <- renderDataTable(
+  ## Summarised personal loanbook
+  p_sum_tab <- reactive(
     cleaned_p_loanbook() %>% 
       p_loanbook_sum_table(strat = input$p_dash_strat)
   )
   
+  ## Summarised data table
+  output$p_loanbook_sum_table <- DT::renderDataTable(
+    p_sum_tab(),
+    options = list(
+      pageLength = 10,
+      scrollX = TRUE,
+      scrollY = TRUE)
+  )
   
+  ## Summary plots of loan book make up
+  output$p_loanbook_sum_plot_amount <- renderPlotly(
+    p_sum_tab() %>% 
+    plot_p_loanbook_summary(yvar = "`Amount lent (£)`", 
+                            strat = input$p_dash_strat,
+                            plotly = TRUE)
+  )
+  
+  output$p_loanbook_sum_plot_no <- renderPlotly(
+    p_sum_tab() %>% 
+      plot_p_loanbook_summary(yvar = "`Number of loan parts`", 
+                              strat = input$p_dash_strat,
+                              plotly = TRUE)
+  )
+  
+  output$p_loanbook_sum_plot_per <- renderPlotly(
+    p_sum_tab() %>% 
+      plot_p_loanbook_summary(yvar = "`Percentage of loanbook (%)`", 
+                              strat = input$p_dash_strat,
+                              plotly = TRUE)
+  )
+
   ## Downloads from scripts
   ## Set up downloadable scripts
   output$downloadData0 <- downloadHandler(filename = "clean_fc_loanbook.R",

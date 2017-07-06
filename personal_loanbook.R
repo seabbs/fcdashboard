@@ -76,15 +76,36 @@ p_loanbook_sum_table <- function(df, strat) {
   total_amount_lent <- sum(df$`Principal remaining`)
   
   ##Summarise loanbook
-  wrapr::let(
-    list(X = strat), {
-      df_sum <- df %>% 
-        group_by(X) %>% 
-        summarise(`Amount lent` = sum(`Principal remaining`),
-                  `Number of loan parts` = sum(`Number of loan parts`),
-                  `Percentage of loanbook` = round(`Amount lent` / total_amount_lent * 100, digits = 1)
-        )
-    }
-  )
+  df_sum <- df %>% 
+    group_by(.dots = strat) %>% 
+    summarise(`Amount lent (£)` = sum(`Principal remaining`),
+              `Number of loan parts` = sum(`Number of loan parts`),
+              `Percentage of loanbook (%)` = round(`Amount lent (£)` / total_amount_lent * 100, digits = 1)
+        ) %>% 
+    mutate(`Amount lent (£)` = round(`Amount lent (£)`, digits = 0))
+
   return(df_sum)
+}
+
+##Plot loan book summary
+plot_p_loanbook_summary <- function(df, 
+                                    yvar, 
+                                    strat,
+                                    plotly = TRUE) {
+  p <- df %>% 
+    ggplot(aes_string(x = strat, y = yvar, colour = strat)) + 
+    geom_segment(aes_string(xend=strat, yend=0)) + 
+    geom_point(size = 7) +
+    geom_text(aes_string(label=yvar, y=yvar),
+              vjust=0, size=2, colour = "white") + 
+    theme_minimal() +
+    theme(axis.text.x=element_text(angle=45,hjust=1),
+          legend.position = "none")
+  
+  
+  if (plotly) {
+    ggplotly(p)
+  }else{
+    p
+  }
 }
