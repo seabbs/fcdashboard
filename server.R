@@ -54,8 +54,14 @@ shinyServer(function(input, output) {
     summary_stats(p_loanbook())
   )
   
+  ## Personal Dashboard
   
-  ## FC dashboard
+  output$p_loanbook_table <- renderDataTable(
+    personal_loanbook
+  )
+  
+  
+  ## Exploratory plots
   
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(

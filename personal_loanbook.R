@@ -49,7 +49,7 @@ library(tidyverse)
 personal_loanbook <- read_csv("personal_loanbook.csv")
 
 
-
+## Join FC and Personal Loanbooks
 bind_loanbooks <- function(personal_loanbook, fc_loanbook, verbose= TRUE) {
   personal_loanbook <- personal_loanbook %>% 
   rename(id = `Loan ID`) %>%

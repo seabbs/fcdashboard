@@ -229,6 +229,19 @@ body <- dashboardBody(
             infoBoxOutput("fc_recovered")
     )
     ),
+    tabItem(tabName = "p_dashboard",
+            fluidRow(
+              column(width = 6,
+                     tabBox( width = NULL,
+                             title = "Summary Tables",
+                             side = "right",
+                             tabPanel(title = "Personal Loanbook",
+                                      dataTableOutput("p_loanbook_table")
+                             )
+                             )
+              )
+            )
+    ),
     tabItem(tabName = "p_exploratory",
             fluidRow(
               tags$head(includeScript("google-analytics.js")),
