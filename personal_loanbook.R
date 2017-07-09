@@ -1,6 +1,6 @@
 library(tidyverse)
 library(wrapr)
-
+library(stringr)
 #' Dataset by loan
 #' Data set contains:
 #' - the number of loan parts owned
@@ -55,10 +55,13 @@ bind_loanbooks <- function(personal_loanbook, fc_loanbook, verbose= TRUE) {
   personal_loanbook <- personal_loanbook %>% 
   rename(id = `Loan ID`) %>%
     mutate(invested_in = "Yes")
-
 combined_loanbook <- fc_loanbook %>% 
   full_join(personal_loanbook) %>% 
-  mutate(invested_in = invested_in %>% replace(is.na(invested_in), "No")) 
+  mutate(invested_in = invested_in %>% 
+           replace(is.na(invested_in), "No")) %>% 
+  mutate(`Repayments made` = as.numeric(as.character(term)) - payments_remaining %>% 
+           as.integer) %>% 
+  mutate(`Percentage repaid` = round(`Repayments made` / as.numeric(as.character(term)) * 100))
 
 if (verbose) {
   loans_without_data <- is.na(combined_loanbook$credit_band) %>% sum
@@ -69,7 +72,72 @@ if (verbose) {
 }
 return(combined_loanbook)
 }
+## Overall summary stats for boxes
+p_loanbook_overall_sum_info <- function(df,
+                                        aplus_bad = 0.6,
+                                        a_bad = 1.5, 
+                                        b_bad = 2.3,
+                                        c_bad = 3.3,
+                                        d_bad = 5,
+                                        e_bad = 8) {
+  ##Transform rate for  calc
+  df <- df %>%
+    mutate(rate_prog = Rate %>% 
+             str_split(pattern = "%") %>%
+             map_chr(paste, collapse = "") %>% 
+             as.numeric) %>% 
+    mutate(adj_rate = rate_prog - 1) %>% 
+    mutate(bad_debt = case_when(Risk %in% "A+" ~ aplus_bad,
+                                Risk %in% "A" ~ a_bad,
+                                Risk %in% "B" ~ b_bad,
+                                Risk %in% "C" ~ c_bad,
+                                Risk %in% "D" ~ d_bad,
+                                Risk %in% "E" ~ e_bad)) %>% 
+    mutate(adj_rate = adj_rate - bad_debt) %>% 
+    mutate(rate_weight = `Principal remaining` / sum(`Principal remaining`))
+  
+  ##Summarise on sector
+  sector_max <- df %>% 
+    group_by(Sector) %>% 
+    summarise(prin_remaining = sum(`Principal remaining`)) %>% 
+    ungroup %>%
+    pull(prin_remaining) %>% 
+    max
+  
+  ## Total lent
+  total_lent <- df$`Principal remaining` %>% sum
 
+  ## Build table
+  df %>% 
+    mutate(crude_interest = rate_prog * `Principal remaining`) %>% 
+    mutate(adj_interest = adj_rate * `Principal remaining`) %>% 
+    summarise(
+      `Amount lent (£)` = sum(`Principal remaining`),
+      `Amount late (%)` = `Principal remaining` %>%
+        replace(!`Loan status` %in% "Late", 0) %>% 
+        sum,
+      `Amount defaulted (%)` = `Principal remaining` %>%
+        replace(!`Loan status` %in% "Defaulted", 0) %>% 
+        sum,
+      `Number of loans invested in` = n(),
+      `Number of loan parts` = sum(`Number of loan parts`),
+      `Maximum lent in a single loan (%)` = max(`Principal remaining`),
+      `Maximum lent to a single sector (%)` = sector_max,
+      `Crude interest rate` = sum(rate_prog * rate_weight) %>% 
+        round(digits = 1) %>% 
+        paste0("%"),
+      `Adjusted interest rate*` = sum(adj_rate * rate_weight) %>% 
+        round(digits = 1) %>% 
+        paste0("%")
+      ) %>% 
+    mutate_at(.vars = c("Amount late (%)",
+                        "Amount defaulted (%)",
+                        "Maximum lent in a single loan (%)",
+                        "Maximum lent to a single sector (%)"),
+              .funs = funs(paste0(., " (", 
+                                  round(. / total_lent * 100, digits = 1),
+                                  "%)")))
+}
 ## Summary table stratified by stratification variable
 p_loanbook_sum_table <- function(df, strat) {
   ## Total amount lent

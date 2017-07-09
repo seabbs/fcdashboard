@@ -44,8 +44,10 @@ shinyServer(function(input, output) {
       filter(invested_in %in% "Yes")
   )
   
-  cleaned_p_loanbook <- reactive(
-    p_loanbook() %>% 
+  ## Clean loan book for dashboard: note repaid loans are dropped here 
+  ## This means that the dashboard represents your loanbook as it is now
+  cleaned_p_loanbook <- reactive({
+clean_loanbook <- p_loanbook() %>% 
       rename(`Loan ID` = id) %>% 
       rename( Region = region_name,
              `Repayment type` = repayment_type,
@@ -53,11 +55,21 @@ shinyServer(function(input, output) {
              `Loan term` = term,
              `Loan purpose` = loan_purpose) %>% 
       select(`Loan ID`, `Loan title`, `Sector`,
-             `Number of loan parts`, Risk, `Repayments left`,
-             `Principal remaining`, Rate, `Next payment date`, 
-             `Loan status`, `Loan term`, `Loan purpose`,
-             Region, `Repayment type`, `Security taken`)
-  )
+             `Number of loan parts`, Risk, `Loan status`,
+             `Repayments made`, `Repayments left`, `Percentage repaid`,
+             `Principal remaining`, Rate, `Next payment date`,
+             `Loan term`, `Loan purpose`, Region, `Repayment type`, 
+             `Security taken`)
+
+if(input$filter_repaid) {
+  clean_loanbook <-  clean_loanbook  %>% 
+    filter(!`Loan status` %in% "Repaid")
+}else{
+  clean_loanbook <- clean_loanbook
+}
+     
+
+})
   
   
   ##Summary stats
@@ -252,12 +264,25 @@ plot_scatter(fc_loanbook(),
   
   ## Personal Dashboard
   
+  ## Loanbook overview
+  output$p_loanbook_overview <- renderTable(
+    p_loanbook_overall_sum_info(cleaned_p_loanbook(),
+                                aplus_bad = input$aplus_bad,
+                                a_bad = as.double(input$a_bad),
+                                b_bad = as.double(input$b_bad),
+                                c_bad = as.double(input$c_bad),
+                                d_bad = as.double(input$d_bad),
+                                e_bad = as.double(input$e_bad))
+  )
+  
   ## Raw data table
   output$p_loanbook_table <- DT::renderDataTable(
     cleaned_p_loanbook(),
     options = list(
       pageLength = 5,
-      scrollX = TRUE)
+      scrollX = TRUE,
+      scrollY = TRUE,
+      rownames = FALSE)
   )
   
   ## Summarised personal loanbook
@@ -270,9 +295,11 @@ plot_scatter(fc_loanbook(),
   output$p_loanbook_sum_table <- DT::renderDataTable(
     p_sum_tab(),
     options = list(
-      pageLength = 10,
+      pageLength = 15,
       scrollX = TRUE,
-      scrollY = TRUE)
+      scrollY = TRUE,
+      orderClasses = TRUE,
+      rownames = FALSE)
   )
   
   ## Summary plots of loan book make up
