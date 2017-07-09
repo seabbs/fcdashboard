@@ -10,7 +10,7 @@ library(ggfortify)
 library(plotly)
 library(lubridate)
 library(wrapr)
-
+library(stringr)
 
 ## Source cleaned data
 source("clean_fc_loanbook.R")
@@ -24,17 +24,40 @@ source("personal_loanbook.R")
 ## Stop spurious warnings
 options(warn = -1)
 
+## Increase upload limit
+options(shiny.maxRequestSize=10*1024^2) 
+
 shinyServer(function(input, output) {
+
+  ## Clean/Load FC data
+  clean_fc_loanbook <- reactive(
+    load_clean_loanbook(input$loanbook)
+  )
+  
+  ##Clean/Load personal data
+  clean_personal_loanbook <- reactive(
+    loan_clean_personal_loanbook(input$personal_loanbook)
+  )
+  
+  ## Set up reactive filtering slider
+  output$date_slider <- renderUI({
+    sliderInput(inputId = 'dates', 
+                label = 'Time Range',
+                min = min(clean_fc_loanbook()$loan_accepted_date),
+                max = max(clean_fc_loanbook()$loan_accepted_date),
+                value = range(clean_fc_loanbook()$loan_accepted_date),
+                timeFormat="%b %Y")
+    })
 
   ## Filter data
   fc_loanbook <- reactive(
-    loanbook %>% filter(loan_accepted_date >= input$dates[1],
+    clean_fc_loanbook() %>% filter(loan_accepted_date >= input$dates[1],
                         loan_accepted_date <= input$dates[2])
   )
   
   combined_loanbook <- reactive(
-    personal_loanbook %>%
-      bind_loanbooks(loanbook, verbose = TRUE)  %>% 
+    clean_personal_loanbook() %>%
+      bind_loanbooks(fc_loanbook(), verbose = TRUE)  %>% 
       filter(loan_accepted_date >= input$dates[1],
              loan_accepted_date <= input$dates[2])
   )

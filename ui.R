@@ -10,6 +10,7 @@ library(ggfortify)
 library(plotly)
 library(lubridate)
 library(wrapr)
+library(stringr)
 
 ## Source cleaned data
 source("clean_fc_loanbook.R")
@@ -47,13 +48,24 @@ sidebar <- dashboardSidebar(
               )
   ),
   hr(),
-  tipify(sliderInput(inputId = 'dates', 
-                     label = 'Time Range',
-                     min = min(loanbook$loan_accepted_date),
-                     max = max(loanbook$loan_accepted_date),
-                     value = range(loanbook$loan_accepted_date),
-                     timeFormat="%b %Y"),
+  tipify(uiOutput("date_slider"),
          title = "Select the data range. Data out of date? Tweet @seabbs."),
+  conditionalPanel(condition = 'input.menu == "readme"',
+                   fileInput("loanbook", 
+                             "Upload FC loanbook",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-seperated-values,text/plain",
+                               ".csv")
+                   ),
+                   fileInput("personal_loanbook", 
+                             "Upload personal loanbook",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-seperated-values,text/plain",
+                               ".csv")
+                   )
+                             ),
   conditionalPanel(condition = 'input.menu == "fc_dashboard"',
 selectInput("fc_yaxis", 
                                "Variable to summarise:",
