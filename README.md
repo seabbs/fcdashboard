@@ -5,7 +5,7 @@ Funding Circle Dashboard
 
 [FC Dashboard](http://seabbs.co.uk/shiny/fcdashboard) is a shiny application that allows exploratory data analysis of the [Funding Circle](https://www.fundingcircle.com) loanbook. It is not affiliated with Funding Circle, the untransformed loanbook data is not provided.
 
-FC Dashboard can also be used as a personal dashboard to enable you to better understand your investments. To enable this functionality download your personal loanbook from Funding Circle and upload it using the upload option in the options menu. For the best experiance it is also recommended to upload an up to date copy of the Funding Circle loanbook (as the app combines the datasets). Data is stored temporarily during your session only; the app can also be run locally if desired (see instructions below).
+FC Dashboard can also be used as a personal dashboard to enable you to better understand your investments. To enable this functionality [download your personal loanbook](https://www.fundingcircle.com/investors/historical_loan_parts_summaries.csv?disable_pagination=true) from Funding Circle and upload it using the upload option in the options menu. For the best experiance it is also recommended to upload an up to date copy of the [Funding Circle loanbook](https://www.fundingcircle.com/loanbook) (as the app combines the datasets). Data is stored temporarily during your session only; the app can also be run locally if desired (see instructions below).
 
 Installing the shiny app locally
 --------------------------------
