@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
+library(shinyWidgets)
 library(DT)
 library(tidyverse)
 library(rmarkdown)
@@ -11,7 +12,6 @@ library(plotly)
 library(lubridate)
 library(wrapr)
 library(stringr)
-
 ## Source cleaned data
 source("clean_fc_loanbook.R")
 
@@ -232,12 +232,37 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Repayment type` = "`Repayment type`",
                                   `Security taken` = "`Security taken`"
                              )),
+                 selectInput("p_dash_facet", 
+                             "Variable to facet by:",
+                             list(`-` = "no_facet",
+                                  Risk = 
+                                    "Risk",
+                                  `Loan purpose` = 
+                                    "`Loan purpose`",
+                                  Sector = "`Sector`",
+                                  `Next payment date` = 
+                                    "`Next payment date`",
+                                  `Loan status` = "`Loan status`",
+                                  Region = "Region",
+                                  `Loan term` = "`Loan term`",
+                                  `Repayments made` = "`Repayments made`",
+                                  `Repayments left` = "`Repayments left`",
+                                  `Percentage repaid` = "`Percentage repaid`",
+                                  `Repayment type` = "`Repayment type`",
+                                  `Security taken` = "`Security taken`"
+                             )),
                  checkboxInput('filter_repaid',
                                "Filter repaid loans",
                                value = TRUE),
+                 checkboxInput("filter_any",
+                               "Filter by a variable",
+                               value = FALSE),
                  checkboxInput("show_bad_debt_opts",
                                "Edit bad debt estimates:",
                                value = FALSE),
+                 conditionalPanel(condition = "input.filter_any",
+                                  uiOutput("filter_var_picker")
+                 ),
                  conditionalPanel(condition = "input.show_bad_debt_opts",
                                         numericInput(inputId = "aplus_bad", 
                                                        label = "A+: Percentage bad debt",

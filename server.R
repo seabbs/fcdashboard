@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
+library(shinyWidgets)
 library(DT)
 library(tidyverse)
 library(rmarkdown)
@@ -67,7 +68,8 @@ shinyServer(function(input, output) {
       filter(invested_in %in% "Yes")
   )
   
-  ## Clean loan book for dashboard: note repaid loans are dropped here 
+  ## Clean loan book for dashboard: note repaid loans are dropped here
+
   ## This means that the dashboard represents your loanbook as it is now
   cleaned_p_loanbook <- reactive({
 clean_loanbook <- p_loanbook() %>% 
@@ -90,10 +92,24 @@ if(input$filter_repaid) {
 }else{
   clean_loanbook <- clean_loanbook
 }
-     
 
 })
   
+  ## Set up reactive filtering variable
+  output$filter_var_picker <- renderUI({
+    
+    choices <- cleaned_p_loanbook() %>% 
+      pull(`Loan status`) %>% 
+      unique %>% 
+      as.list
+    
+    pickerInput(
+      inputId = "p_dash_filt_var", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE), 
+      multiple = TRUE
+    )
+  })
   
   ##Summary stats
   fc_sumstats <- reactive(
@@ -313,10 +329,21 @@ plot_scatter(fc_loanbook(),
     cleaned_p_loanbook() %>% 
       p_loanbook_sum_table(strat = input$p_dash_strat)
   )
+  ##Summarise facet personalised loanbook
+  p_sum_tab_strat <- reactive({
+    if(input$p_dash_facet %in%  "no_facet") {
+      strat <- input$p_dash_strat
+    }else {
+      strat <- c(input$p_dash_strat, input$p_dash_facet)
+    }
+    
+    cleaned_p_loanbook() %>% 
+      p_loanbook_sum_table(strat = strat)
+  })
   
   ## Summarised data table
   output$p_loanbook_sum_table <- DT::renderDataTable(
-    p_sum_tab(),
+    p_sum_tab_strat(),
     options = list(
       pageLength = 15,
       scrollX = TRUE,
@@ -327,23 +354,26 @@ plot_scatter(fc_loanbook(),
   
   ## Summary plots of loan book make up
   output$p_loanbook_sum_plot_amount <- renderPlotly(
-    p_sum_tab() %>% 
-    plot_p_loanbook_summary(yvar = "`Amount lent (£)`", 
-                            strat = input$p_dash_strat,
-                            plotly = TRUE)
+    p_sum_tab_strat() %>%
+      plot_p_loanbook_summary(yvar = "`Amount lent (£)`", 
+                              strat = input$p_dash_strat,
+                              facet = input$p_dash_facet,
+                              plotly = TRUE)
   )
   
   output$p_loanbook_sum_plot_no <- renderPlotly(
-    p_sum_tab() %>% 
+    p_sum_tab_strat() %>%  
       plot_p_loanbook_summary(yvar = "`Number of loan parts`", 
                               strat = input$p_dash_strat,
+                              facet = input$p_dash_facet,
                               plotly = TRUE)
   )
   
   output$p_loanbook_sum_plot_per <- renderPlotly(
-    p_sum_tab() %>% 
+    p_sum_tab_strat() %>% 
       plot_p_loanbook_summary(yvar = "`Percentage of loanbook (%)`", 
                               strat = input$p_dash_strat,
+                              facet = input$p_dash_facet,
                               plotly = TRUE)
   )
 
