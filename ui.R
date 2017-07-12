@@ -251,18 +251,31 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Repayment type` = "`Repayment type`",
                                   `Security taken` = "`Security taken`"
                              )),
-                 checkboxInput('filter_repaid',
-                               "Filter repaid loans",
-                               value = TRUE),
-                 checkboxInput("filter_any",
-                               "Filter by a variable",
-                               value = FALSE),
+                 selectInput("p_dash_filter", 
+                             "Variable to filter by:",
+                             list(`-` = "no_filter",
+                                  Risk = 
+                                    "Risk",
+                                  `Loan purpose` = 
+                                    "`Loan purpose`",
+                                  Sector = "`Sector`",
+                                  `Next payment date` = 
+                                    "`Next payment date`",
+                                  `Loan status` = "`Loan status`",
+                                  Region = "Region",
+                                  `Loan term` = "`Loan term`",
+                                  `Repayments made` = "`Repayments made`",
+                                  `Repayments left` = "`Repayments left`",
+                                  `Percentage repaid` = "`Percentage repaid`",
+                                  `Repayment type` = "`Repayment type`",
+                                  `Security taken` = "`Security taken`"
+                             )),
+                 conditionalPanel(condition = "input.p_dash_filter != 'no_filter'",
+                                  uiOutput("filter_var_picker")
+                 ),
                  checkboxInput("show_bad_debt_opts",
                                "Edit bad debt estimates:",
                                value = FALSE),
-                 conditionalPanel(condition = "input.filter_any",
-                                  uiOutput("filter_var_picker")
-                 ),
                  conditionalPanel(condition = "input.show_bad_debt_opts",
                                         numericInput(inputId = "aplus_bad", 
                                                        label = "A+: Percentage bad debt",
@@ -301,7 +314,10 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                                          max = 100,
                                                          value = 8,
                                                          step = 0.1)
-                        )
+                        ),
+                 checkboxInput('filter_repaid',
+                               "Filter repaid loans",
+                               value = TRUE)
                  ),
   helpText("Developed by ", 
            a("Sam Abbott", href = "http://samabbott.co.uk"), ".",

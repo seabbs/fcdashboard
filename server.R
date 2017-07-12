@@ -52,7 +52,8 @@ shinyServer(function(input, output) {
 
   ## Filter data
   fc_loanbook <- reactive(
-    clean_fc_loanbook() %>% filter(loan_accepted_date >= input$dates[1],
+    clean_fc_loanbook() %>% 
+      filter(loan_accepted_date >= input$dates[1],
                         loan_accepted_date <= input$dates[2])
   )
   
@@ -65,20 +66,41 @@ shinyServer(function(input, output) {
   
   p_loanbook <- reactive(
     combined_loanbook() %>% 
-      filter(invested_in %in% "Yes")
+      filter(invested_in %in% "Yes") %>% 
+      mutate(`Loan ID` = id) %>% 
+      mutate(  Region = region_name,
+              `Repayment type` = repayment_type,
+              `Security taken` = security_taken,
+              `Loan term` = term,
+              `Loan purpose` = loan_purpose)
   )
   
-  ## Clean loan book for dashboard: note repaid loans are dropped here
+  ## Set up reactive filtering variable
+  output$filter_var_picker <- renderUI({
+    if(input$p_dash_filter %in% "no_filter") {
+     choices <- NULL
+    }else{
+      choices <- p_loanbook()[[input$p_dash_filter]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
 
+    pickerInput(
+      inputId = "p_dash_filt_var", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      selected = choices,
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
+  ## Clean loan book for dashboard: note repaid loans are dropped here
   ## This means that the dashboard represents your loanbook as it is now
+  ## if filtering is selected, the filter loanbook
   cleaned_p_loanbook <- reactive({
 clean_loanbook <- p_loanbook() %>% 
-      rename(`Loan ID` = id) %>% 
-      rename( Region = region_name,
-             `Repayment type` = repayment_type,
-             `Security taken` = security_taken,
-             `Loan term` = term,
-             `Loan purpose` = loan_purpose) %>% 
       select(`Loan ID`, `Loan title`, `Sector`,
              `Number of loan parts`, Risk, `Loan status`,
              `Repayments made`, `Repayments left`, `Percentage repaid`,
@@ -93,23 +115,16 @@ if(input$filter_repaid) {
   clean_loanbook <- clean_loanbook
 }
 
-})
-  
-  ## Set up reactive filtering variable
-  output$filter_var_picker <- renderUI({
-    
-    choices <- cleaned_p_loanbook() %>% 
-      pull(`Loan status`) %>% 
-      unique %>% 
-      as.list
-    
-    pickerInput(
-      inputId = "p_dash_filt_var", 
-      label = "Select/deselect all options", 
-      choices = choices, options = list(`actions-box` = TRUE), 
-      multiple = TRUE
+if(!input$p_dash_filter %in% "no_filter") {
+  clean_loanbook <- clean_loanbook %>% 
+    filter_at(.vars = input$p_dash_filter, 
+              all_vars(. %in% input$p_dash_filt_var)
     )
-  })
+}else {
+  clean_loanbook <- clean_loanbook
+}
+
+})
   
   ##Summary stats
   fc_sumstats <- reactive(
@@ -122,7 +137,6 @@ if(input$filter_repaid) {
   )
   
   ## Exploratory plots
-  
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(
     if (input$fc_yaxis %in% "defaulted") {
