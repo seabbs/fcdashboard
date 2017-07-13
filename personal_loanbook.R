@@ -68,14 +68,14 @@ p_loanbook_overall_sum_info <- function(df,
              str_split(pattern = "%") %>%
              map_chr(paste, collapse = "") %>% 
              as.numeric) %>% 
-    mutate(adj_rate = rate_prog - 1) %>% 
     mutate(bad_debt = case_when(Risk %in% "A+" ~ aplus_bad,
                                 Risk %in% "A" ~ a_bad,
                                 Risk %in% "B" ~ b_bad,
                                 Risk %in% "C" ~ c_bad,
                                 Risk %in% "D" ~ d_bad,
                                 Risk %in% "E" ~ e_bad)) %>% 
-    mutate(adj_rate = adj_rate - bad_debt) %>% 
+    mutate(anul_adj_rate = 100 * (1 + (rate_prog - bad_debt - 1) / (100 * 12)) ^ 12 - 100) %>% 
+    mutate(anul_rate_prog = 100 * (1 + rate_prog / (100 * 12)) ^ 12 - 100) %>% 
     mutate(rate_weight = `Principal remaining` / sum(`Principal remaining`))
   
   ##Summarise on sector
@@ -91,8 +91,8 @@ p_loanbook_overall_sum_info <- function(df,
 
   ## Build table
   df %>% 
-    mutate(crude_interest = rate_prog * `Principal remaining`) %>% 
-    mutate(adj_interest = adj_rate * `Principal remaining`) %>% 
+    mutate(crude_interest = anul_rate_prog * `Principal remaining`) %>% 
+    mutate(adj_interest = anul_adj_rate * `Principal remaining`) %>% 
     summarise(
       `Amount lent` = sum(`Principal remaining`) %>% 
         paste0("£", .),
@@ -106,10 +106,10 @@ p_loanbook_overall_sum_info <- function(df,
       `Number of loan parts` = sum(`Number of loan parts`),
       `Maximum lent in a single loan (%)` = max(`Principal remaining`),
       `Maximum lent to a single sector (%)` = sector_max,
-      `Crude interest rate` = sum(rate_prog * rate_weight) %>% 
+      `Crude interest rate` = sum(anul_rate_prog * rate_weight) %>% 
         round(digits = 1) %>% 
         paste0("%"),
-      `Adjusted interest rate*` = sum(adj_rate * rate_weight) %>% 
+      `Adjusted interest rate*` = sum(anul_adj_rate * rate_weight) %>% 
         round(digits = 1) %>% 
         paste0("%")
       ) %>% 

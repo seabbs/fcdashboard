@@ -90,7 +90,6 @@ shinyServer(function(input, output) {
       inputId = "p_dash_filt_var", 
       label = "Select/deselect all options", 
       choices = choices, options = list(`actions-box` = TRUE),
-      selected = choices,
       multiple = TRUE,
       width = "auto"
     )
@@ -117,7 +116,7 @@ if(input$filter_repaid) {
 
 if(!input$p_dash_filter %in% "no_filter") {
   clean_loanbook <- clean_loanbook %>% 
-    filter_at(.vars = input$p_dash_filter, 
+    filter_at(.vars = c(input$p_dash_filter), 
               all_vars(. %in% input$p_dash_filt_var)
     )
 }else {

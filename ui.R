@@ -257,18 +257,18 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   Risk = 
                                     "Risk",
                                   `Loan purpose` = 
-                                    "`Loan purpose`",
-                                  Sector = "`Sector`",
+                                    "Loan purpose",
+                                  Sector = "Sector",
                                   `Next payment date` = 
-                                    "`Next payment date`",
-                                  `Loan status` = "`Loan status`",
+                                    "Next payment date",
+                                  `Loan status` = "Loan status",
                                   Region = "Region",
-                                  `Loan term` = "`Loan term`",
-                                  `Repayments made` = "`Repayments made`",
-                                  `Repayments left` = "`Repayments left`",
-                                  `Percentage repaid` = "`Percentage repaid`",
-                                  `Repayment type` = "`Repayment type`",
-                                  `Security taken` = "`Security taken`"
+                                  `Loan term` = "Loan term",
+                                  `Repayments made` = "Repayments made",
+                                  `Repayments left` = "Repayments left",
+                                  `Percentage repaid` = "Percentage repaid",
+                                  `Repayment type` = "Repayment type",
+                                  `Security taken` = "Security taken"
                              )),
                  conditionalPanel(condition = "input.p_dash_filter != 'no_filter'",
                                   uiOutput("filter_var_picker")
