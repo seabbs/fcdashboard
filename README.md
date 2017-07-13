@@ -16,6 +16,7 @@ To install and run the shiny app locally on your own computer you will need to f
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("shinyBS")
+install.packages("shinyWidgets")
 install.packages("DT")
 install.packages("tidyverse")
 install.packages("rmarkdown")
