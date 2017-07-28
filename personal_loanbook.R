@@ -29,6 +29,14 @@ loan_clean_personal_loanbook <- function(personal_loanbook_path) {
       levels = c("A+", "A", "B", "C", "D", "E")
     ))
   
+  ##Munge and reformat rate so that it is ordered
+  personal_loanbook <- personal_loanbook %>%
+    mutate(Rate = str_replace_all(Rate, "%", "") %>% 
+             as.numeric) %>% 
+    mutate(Rate = Rate %>% 
+             factor(levels = unique(Rate)[order(unique(Rate))],
+                    ordered = TRUE)
+           ) 
   return(personal_loanbook)
 }
 
