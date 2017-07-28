@@ -47,7 +47,7 @@ shinyServer(function(input, output) {
                 min = min(clean_fc_loanbook()$loan_accepted_date),
                 max = max(clean_fc_loanbook()$loan_accepted_date),
                 value = range(clean_fc_loanbook()$loan_accepted_date),
-                timeFormat="%b %Y")
+                timeFormat = "%b %Y")
     })
 
   ## Filter data
@@ -77,7 +77,7 @@ shinyServer(function(input, output) {
   
   ## Set up reactive filtering variable
   output$filter_var_picker <- renderUI({
-    if(input$p_dash_filter %in% "no_filter") {
+    if (input$p_dash_filter %in% "no_filter") {
      choices <- NULL
     }else{
       choices <- p_loanbook()[[input$p_dash_filter]] %>%
@@ -107,14 +107,14 @@ clean_loanbook <- p_loanbook() %>%
              `Loan term`, `Loan purpose`, Region, `Repayment type`, 
              `Security taken`)
 
-if(input$filter_repaid) {
+if (input$filter_repaid) {
   clean_loanbook <-  clean_loanbook  %>% 
     filter(!`Loan status` %in% "Repaid")
 }else{
   clean_loanbook <- clean_loanbook
 }
 
-if(!input$p_dash_filter %in% "no_filter") {
+if (!input$p_dash_filter %in% "no_filter") {
   clean_loanbook <- clean_loanbook %>% 
     filter_at(.vars = c(input$p_dash_filter), 
               all_vars(. %in% input$p_dash_filt_var)
@@ -145,12 +145,14 @@ if(!input$p_dash_filter %in% "no_filter") {
       plot_by_date( 
                    by = "defaulted", 
                    strat = input$fc_strat_var,
-                   plotly = TRUE)
+                   plotly = TRUE,
+                   round_date = input$fc_round_date)
     }else{
       plot_by_date(fc_loanbook(), 
                    by = input$fc_yaxis, 
                    strat = input$fc_strat_var,
-                   plotly = TRUE)
+                   plotly = TRUE,
+                   round_date = input$fc_round_date)
     }
 
   )
@@ -163,12 +165,14 @@ if(!input$p_dash_filter %in% "no_filter") {
         plot_by_date( 
           by = "defaulted", 
           strat = input$p_strat_var,
-          plotly = TRUE)
+          plotly = TRUE,
+          round_date = input$p_round_date)
     }else{
       plot_by_date(p_loanbook(), 
                    by = input$p_yaxis, 
                    strat = input$p_strat_var,
-                   plotly = TRUE)
+                   plotly = TRUE,
+                   round_date = input$p_round_date)
     }
     
   )

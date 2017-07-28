@@ -94,20 +94,7 @@ selectInput("fc_yaxis",
                                     `Security taken` = "security_taken"
                                )
                                
-                   ),
-                   selectInput("fc_com_var", 
-                               "Variable to compare against:",
-                               list(`Interest rate` = "interest_rate",
-                                    `Loan amount` = 
-                                      "loan_amount",
-                                    Recoveries = 
-                                      "recoveries",
-                                    `Principal remaining` = 
-                                      "principal_remaining",
-                                    Defaulted = "defaulted",
-                                    `Payments remaining` = "payments_remaining",
-                                    `Term` = "term"
-                               ))),
+                   )),
 conditionalPanel(condition = 'input.menu == "p_exploratory"',
                  selectInput("p_yaxis", 
                              "Variable to summarise:",
@@ -136,20 +123,7 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Security taken` = "security_taken"
                              )
                              
-                 ),
-                 selectInput("p_com_var", 
-                             "Variable to compare against:",
-                             list(`Interest rate` = "interest_rate",
-                                  `Loan amount` = 
-                                    "loan_amount",
-                                  Recoveries = 
-                                    "recoveries",
-                                  `Principal remaining` = 
-                                    "principal_remaining",
-                                  Defaulted = "defaulted",
-                                  `Payments remaining` = "payments_remaining",
-                                  `Term` = "term"
-                             ))),
+                 )),
 conditionalPanel(condition = 'input.menu == "fc_pca"',
                  sliderInput(inputId = "fc_no_pca", 
                              label = "Number of Principal components:",
@@ -340,11 +314,31 @@ body <- dashboardBody(
                       title = "Summary Plots",
                       side = "right",
                       tabPanel(title = "By Year",
-                               plotlyOutput("fc_plottotal", height = "200%")),
+                               plotlyOutput("fc_plottotal", height = "200%"),
+                               selectInput("fc_round_date", 
+                                           "Time to aggregate by:",
+                                           list(Year = "year",
+                                                Month = "month",
+                                                Week =  "week",
+                                                Day = "day"))
+                               ),
                       tabPanel(title = "By Stratified Variable",
                                plotlyOutput("fc_plotdist", height = "200%")),
                       tabPanel(title = "Variable vs. Variable",
-                               plotlyOutput("fc_plotscatter", height = "200%"))),
+                               plotlyOutput("fc_plotscatter", height = "200%"),
+                               selectInput("fc_com_var", 
+                                           "Variable to compare against:",
+                                           list(`Interest rate` = "interest_rate",
+                                                `Loan amount` = 
+                                                  "loan_amount",
+                                                Recoveries = 
+                                                  "recoveries",
+                                                `Principal remaining` = 
+                                                  "principal_remaining",
+                                                Defaulted = "defaulted",
+                                                `Payments remaining` = "payments_remaining",
+                                                `Term` = "term"
+                                           )))),
             infoBoxOutput("fc_amount_lent"),
             infoBoxOutput("fc_repaid"),
             infoBoxOutput("fc_defaulted"),
@@ -391,11 +385,30 @@ body <- dashboardBody(
                       title = "Summary Plots",
                       side = "right",
                       tabPanel(title = "By Year",
-                               plotlyOutput("p_plottotal", height = "200%")),
+                               plotlyOutput("p_plottotal", height = "200%"),
+                               selectInput("p_round_date", 
+                                           "Time to aggregate by:",
+                                           list(Year = "year",
+                                                Month = "month",
+                                                Week =  "week",
+                                                Day = "day"))),
                       tabPanel(title = "By Stratified Variable",
                                plotlyOutput("p_plotdist", height = "200%")),
                       tabPanel(title = "Variable vs. Variable",
-                               plotlyOutput("p_plotscatter", height = "200%"))),
+                               plotlyOutput("p_plotscatter", height = "200%"),
+                               selectInput("p_com_var", 
+                                           "Variable to compare against:",
+                                           list(`Interest rate` = "interest_rate",
+                                                `Loan amount` = 
+                                                  "loan_amount",
+                                                Recoveries = 
+                                                  "recoveries",
+                                                `Principal remaining` = 
+                                                  "principal_remaining",
+                                                Defaulted = "defaulted",
+                                                `Payments remaining` = "payments_remaining",
+                                                `Term` = "term"
+                                           )))),
               infoBoxOutput("p_amount_lent"),
               infoBoxOutput("p_repaid"),
               infoBoxOutput("p_defaulted"),

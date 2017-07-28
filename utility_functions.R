@@ -21,19 +21,19 @@ summary_stats <- function(df) {
 plot_by_date <- function(df, 
                          by = "loan_amount", 
                          strat = "credit_band",
-                         plotly = TRUE) {
+                         plotly = TRUE,
+                         round_date = "month") {
   wrapr::let(
     list(X = by, Y = strat), {
       df <- df %>% 
-        mutate(`Loan Acceptance (by month)` = 
-                 lubridate::round_date(loan_accepted_date, unit = "month"),
-               Year = lubridate::year(loan_accepted_date)) %>% 
-        dplyr::group_by(`Loan Acceptance (by month)`, Y, Year)  %>% 
+        mutate(`Loan Acceptance` = 
+                 lubridate::round_date(loan_accepted_date, unit = round_date)) %>% 
+        dplyr::group_by(`Loan Acceptance`, Y)  %>% 
         dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
         na.omit
       
       p <- df %>% 
-        ggplot(aes(x = `Loan Acceptance (by month)`,
+        ggplot(aes(x = `Loan Acceptance`,
                    y = X, 
                    colour = Y)) +
         ylab(paste0(by, " (£, Millions)")) +
