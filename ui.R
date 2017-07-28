@@ -218,6 +218,7 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                              "Variable to stratify by:",
                              list(Risk = 
                                     "Risk",
+                                  Rate = "Rate",
                                   `Loan purpose` = 
                                     "`Loan purpose`",
                                   Sector = "`Sector`",
@@ -237,6 +238,7 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                              list(`-` = "no_facet",
                                   Risk = 
                                     "Risk",
+                                  Rate = "Rate",
                                   `Loan purpose` = 
                                     "`Loan purpose`",
                                   Sector = "`Sector`",
@@ -256,6 +258,7 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                              list(`-` = "no_filter",
                                   Risk = 
                                     "Risk",
+                                  Rate = "Rate",
                                   `Loan purpose` = 
                                     "Loan purpose",
                                   Sector = "Sector",
