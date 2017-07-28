@@ -17,6 +17,54 @@ summary_stats <- function(df) {
     ) 
 }
 
+##Plot loan book summary
+plot_loanbook_summary <- function(df, 
+                                  yvar, 
+                                  strat,
+                                  facet,
+                                  scaled_to_mil = FALSE,
+                                  plotly = TRUE) {
+  
+  if (facet %in% "no_facet") {
+    size_point <- 7
+  }else {
+    size_point <- 2
+  }
+  
+  p <- df %>% 
+    ggplot(aes_string(x = strat, y = yvar, colour = strat)) + 
+    geom_segment(aes_string(xend = strat, yend = 0)) + 
+    geom_point(size = size_point)
+  
+  if (facet %in% "no_facet") {
+    p <- p +
+      geom_text(aes_string(label = yvar, y = yvar),
+                vjust = 0, size = 2, colour = "white")
+  }
+  
+  if (scaled_to_mil) {
+    p <- p +
+      ylab(paste0(yvar, " (£, Millions)"))
+  }
+  
+  p <- p +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45,hjust = 1),
+          legend.position = "none")
+  
+  if (!facet %in% "no_facet") {
+    p <- p +
+      facet_wrap(facet, scales = "free_y")
+  }
+  
+  if (plotly) {
+    ggplotly(p)
+  }else{
+    p
+  }
+}
+
+
 #' Plot amount lent
 plot_by_date <- function(df, 
                          by = "loan_amount", 
@@ -50,7 +98,7 @@ plot_by_date <- function(df,
         theme(legend.position = "bottom")
       
       if (!facet %in% "no_facet") {
-        p <- p + facet_wrap(facet, scales = "free")
+        p <- p + facet_wrap(facet, scales = "free_y")
       }
     }
   )
@@ -85,7 +133,7 @@ plot_dist <- function(df,
               legend.position = "none")
       
       if (!facet %in% "no_facet") {
-        p <- p + facet_wrap(facet, scales = "free")
+        p <- p + facet_wrap(facet, scales = "free_y")
       }
       
       if (plotly) {
@@ -130,7 +178,7 @@ plot_scatter <- function(df,
         theme_minimal()
       
       if (!facet %in% "no_facet") {
-        p <- p + facet_wrap(facet, scales = "free")
+        p <- p + facet_wrap(facet, scales = "fixed")
       }
       
       if (plotly) {

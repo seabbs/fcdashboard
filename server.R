@@ -206,6 +206,60 @@ if (!input$p_dash_filter %in% "no_filter") {
   )
   
   ## Exploratory plots
+  ## plot loanbook summary - fc
+  output$fc_plotsummary <- renderPlotly({
+    if (input$fc_facet_var %in% "no_facet") {
+      strat <- input$fc_strat_var
+    }else{
+      strat <- c(input$fc_strat_var, input$fc_facet_var)
+    }
+    
+    if (input$fc_yaxis %in% "defaulted") {
+      sum_fc_loanbook <-  filt_fc_loanbook()  %>% 
+        filter(status %in% "defaulted") %>% 
+        mutate(defaulted = principal_remaining)
+    }else{
+      sum_fc_loanbook <-  filt_fc_loanbook()
+    }
+    
+    sum_fc_loanbook %>% 
+      group_by(.dots = strat) %>% 
+      summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.))) %>% 
+      mutate_at(.vars = input$fc_yaxis, .funs = funs(round(./1e6, digits = 1))) %>% 
+      plot_loanbook_summary(yvar = input$fc_yaxis, 
+                              strat = input$fc_strat_var,
+                              facet = input$fc_facet_var,
+                              scaled_to_mil = TRUE,
+                              plotly = TRUE)
+  })
+  
+  
+  ## plot loanbook summary - personal
+  output$p_plotsummary <- renderPlotly({
+    if (input$p_facet_var %in% "no_facet") {
+      strat <- input$p_strat_var
+    }else{
+      strat <- c(input$p_strat_var, input$p_facet_var)
+    }
+    
+    if (input$p_yaxis %in% "defaulted") {
+      sum_p_loanbook <-  filt_p_loanbook()  %>% 
+        filter(status %in% "defaulted") %>% 
+        mutate(defaulted = principal_remaining)
+    }else{
+      sum_p_loanbook <-  filt_p_loanbook()
+    }
+    
+    sum_p_loanbook %>% 
+      group_by(.dots = strat) %>% 
+      summarise_at(.vars = input$p_yaxis, .funs = funs(sum(.))) %>% 
+      mutate_at(.vars = input$p_yaxis, .funs = funs(round(./1e6, digits = 1))) %>% 
+      plot_loanbook_summary(yvar = input$p_yaxis, 
+                              strat = input$p_strat_var,
+                              facet = input$p_facet_var,
+                              scaled_to_mil = TRUE,
+                              plotly = TRUE)
+  })
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(
     if (input$fc_yaxis %in% "defaulted") {
@@ -428,7 +482,7 @@ plot_scatter(filt_fc_loanbook(),
   )
   ##Summarise facet personalised loanbook
   p_sum_tab_strat <- reactive({
-    if(input$p_dash_facet %in%  "no_facet") {
+    if (input$p_dash_facet %in%  "no_facet") {
       strat <- input$p_dash_strat
     }else {
       strat <- c(input$p_dash_strat, input$p_dash_facet)
@@ -452,7 +506,7 @@ plot_scatter(filt_fc_loanbook(),
   ## Summary plots of loan book make up
   output$p_loanbook_sum_plot_amount <- renderPlotly(
     p_sum_tab_strat() %>%
-      plot_p_loanbook_summary(yvar = "`Amount lent (£)`", 
+      plot_loanbook_summary(yvar = "`Amount lent (£)`", 
                               strat = input$p_dash_strat,
                               facet = input$p_dash_facet,
                               plotly = TRUE)
@@ -460,7 +514,7 @@ plot_scatter(filt_fc_loanbook(),
   
   output$p_loanbook_sum_plot_no <- renderPlotly(
     p_sum_tab_strat() %>%  
-      plot_p_loanbook_summary(yvar = "`Number of loan parts`", 
+      plot_loanbook_summary(yvar = "`Number of loan parts`", 
                               strat = input$p_dash_strat,
                               facet = input$p_dash_facet,
                               plotly = TRUE)
@@ -468,7 +522,7 @@ plot_scatter(filt_fc_loanbook(),
   
   output$p_loanbook_sum_plot_per <- renderPlotly(
     p_sum_tab_strat() %>% 
-      plot_p_loanbook_summary(yvar = "`Percentage of loanbook (%)`", 
+      plot_loanbook_summary(yvar = "`Percentage of loanbook (%)`", 
                               strat = input$p_dash_strat,
                               facet = input$p_dash_facet,
                               plotly = TRUE)
