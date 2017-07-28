@@ -21,14 +21,21 @@ summary_stats <- function(df) {
 plot_by_date <- function(df, 
                          by = "loan_amount", 
                          strat = "credit_band",
+                         facet = "no_facet",
                          plotly = TRUE,
                          round_date = "month") {
   wrapr::let(
-    list(X = by, Y = strat), {
+    list(X = by, Y = strat, Fa = facet), {
       df <- df %>% 
         mutate(`Loan Acceptance` = 
-                 lubridate::round_date(loan_accepted_date, unit = round_date)) %>% 
-        dplyr::group_by(`Loan Acceptance`, Y)  %>% 
+                 lubridate::round_date(loan_accepted_date, unit = round_date))
+      
+      if (!facet %in% "no_facet") {
+        df <- df %>% dplyr::group_by(`Loan Acceptance`, Y, Fa)
+      }else{
+        df <- df %>% dplyr::group_by(`Loan Acceptance`, Y)
+      }
+        df <- df  %>% 
         dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
         na.omit
       
@@ -41,6 +48,10 @@ plot_by_date <- function(df,
         geom_line() +
         theme_minimal() +
         theme(legend.position = "bottom")
+      
+      if (!facet %in% "no_facet") {
+        p <- p + facet_wrap(facet, scales = "free")
+      }
     }
   )
   
@@ -48,7 +59,7 @@ plot_by_date <- function(df,
   
   if (plotly) {
     ggplotly(p) %>%
-      plotly:: layout(autosize = TRUE)
+      plotly::layout(autosize = TRUE)
   }else {
     p
   }
@@ -58,6 +69,7 @@ plot_by_date <- function(df,
 plot_dist <- function(df, 
                       by = "loan_amount",
                       strat = "credit_band",
+                      facet = "no_facet",
                       plotly = TRUE)
   wrapr::let(
     list(X = by, Y = strat), {
@@ -69,12 +81,16 @@ plot_dist <- function(df,
         geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
         ylab(paste0(by, " (£, Thousands)")) +
         theme_minimal() +
-        theme(axis.text.x=element_text(angle=45,hjust=1),
+        theme(axis.text.x = element_text(angle = 45,hjust = 1),
               legend.position = "none")
+      
+      if (!facet %in% "no_facet") {
+        p <- p + facet_wrap(facet, scales = "free")
+      }
       
       if (plotly) {
         ggplotly(p) %>%
-          plotly:: layout(autosize = TRUE)
+          plotly::layout(autosize = TRUE)
       }else {
         p
       }
@@ -86,9 +102,10 @@ plot_scatter <- function(df,
                          by = "loan_amount",
                          also_by = "term",
                          strat = "credit_band",
+                         facet = "no_facet",
                          plotly = TRUE,
                          alpha = 0.4) {
-  if(also_by %in% "term") {
+  if (also_by %in% "term") {
     df <- df %>% 
       mutate(term = term %>% 
                as.character %>% 
@@ -102,7 +119,7 @@ plot_scatter <- function(df,
   }
   
   wrapr::let(
-    list(X = by, Y = strat, Z= also_by), {
+    list(X = by, Y = strat, Z = also_by), {
       
       
       p <- df %>%
@@ -112,9 +129,13 @@ plot_scatter <- function(df,
         xlab(paste0(by, " (£, Thousands)")) +
         theme_minimal()
       
+      if (!facet %in% "no_facet") {
+        p <- p + facet_wrap(facet, scales = "free")
+      }
+      
       if (plotly) {
         ggplotly(p) %>%
-          plotly:: layout(autosize = TRUE)
+          plotly::layout(autosize = TRUE)
       }else {
         p
       }

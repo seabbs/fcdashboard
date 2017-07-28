@@ -29,15 +29,15 @@ sidebar <- dashboardSidebar(
   hr(),
   sidebarMenu(id = "menu",
               menuItem("Personal Dashboard", icon = icon("dashboard"),
-                       menuSubItem("Dashboard", tabName = "p_dashboard", icon=icon("dashboard")),
-                       menuSubItem("Exploratory Plots", tabName = "p_exploratory", icon=icon("line-chart")),
+                       menuSubItem("Dashboard", tabName = "p_dashboard", icon = icon("dashboard")),
+                       menuSubItem("Exploratory Plots", tabName = "p_exploratory", icon = icon("line-chart")),
                        menuSubItem("PCA", tabName = "p_pca", icon = icon("line-chart"))
               ),
               menuItem("FC Dashboard", icon = icon("dashboard"),
-                       menuSubItem("Dashboard", tabName = "fc_dashboard", icon=icon("dashboard")),
+                       menuSubItem("Dashboard", tabName = "fc_dashboard", icon = icon("dashboard")),
                        menuSubItem("PCA", tabName = "fc_pca", icon = icon("line-chart"))
                        ),
-              menuItem("About", tabName = "readme", icon=icon("info"), selected = TRUE),
+              menuItem("About", tabName = "readme", icon = icon("info"), selected = TRUE),
               menuItem("Code",  icon = icon("code"),
                        menuSubItem("Github", href = "https://github.com/seabbs/fcdashboard", icon = icon("github")),
                        menuSubItem("clean_fc_loanbook.R", tabName = "dataclean", icon = icon("angle-right")),
@@ -94,7 +94,44 @@ selectInput("fc_yaxis",
                                     `Security taken` = "security_taken"
                                )
                                
-                   )),
+                   ),
+                    selectInput("fc_facet_var", 
+                                "Variable to facet by:",
+                                list(`-` = "no_facet",
+                                     `Credit band` = 
+                                       "credit_band",
+                                     Status = 
+                                       "status",
+                                     `Loan purpose` = 
+                                       "loan_purpose",
+                                     Sector = "sector",
+                                     Region = "region_name",
+                                     `Loan term` = "term",
+                                     `Whole loan` = "whole_loan",
+                                     `Repayment type` = "repayment_type",
+                                     `Security taken` = "security_taken"
+                                )
+                                
+                  ),
+                  selectInput("fc_dash_filter", 
+                  "Variable to filter by:",
+                  list(`-` = "no_filter",
+                       `Credit band` = 
+                       "credit_band",
+                      Status = 
+                       "status",
+                       `Loan purpose` = 
+                       "loan_purpose",
+                       Sector = "sector",
+                       Region = "region_name",
+                       `Loan term` = "term",
+                       `Whole loan` = "whole_loan",
+                       `Repayment type` = "repayment_type",
+                       `Security taken` = "security_taken"
+                    )),
+                  conditionalPanel(condition = "input.fc_dash_filter != 'no_filter'",
+                                   uiOutput("filter_var_picker_fc_dash")
+                  )),
 conditionalPanel(condition = 'input.menu == "p_exploratory"',
                  selectInput("p_yaxis", 
                              "Variable to summarise:",
@@ -123,6 +160,43 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Security taken` = "security_taken"
                              )
                              
+                 ),
+                 selectInput("p_facet_var", 
+                             "Variable to facet by:",
+                             list(`-` = "no_facet",
+                                  `Credit band` = 
+                                    "credit_band",
+                                  Status = 
+                                    "status",
+                                  `Loan purpose` = 
+                                    "loan_purpose",
+                                  Sector = "sector",
+                                  Region = "region_name",
+                                  `Loan term` = "term",
+                                  `Whole loan` = "whole_loan",
+                                  `Repayment type` = "repayment_type",
+                                  `Security taken` = "security_taken"
+                             )
+                             
+                 ),
+                 selectInput("p_exp_filter", 
+                                 "Variable to filter by:",
+                             list(`-` = "no_filter",
+                                  `Credit band` = 
+                                    "credit_band",
+                                  Status = 
+                                    "status",
+                                  `Loan purpose` = 
+                                    "loan_purpose",
+                                  Sector = "sector",
+                                  Region = "region_name",
+                                  `Loan term` = "term",
+                                  `Whole loan` = "whole_loan",
+                                  `Repayment type` = "repayment_type",
+                                  `Security taken` = "security_taken"
+                             )),
+                 conditionalPanel(condition = "input.p_exp_filter != 'no_filter'",
+                                  uiOutput("filter_var_picker_p_exp")
                  )),
 conditionalPanel(condition = 'input.menu == "fc_pca"',
                  sliderInput(inputId = "fc_no_pca", 

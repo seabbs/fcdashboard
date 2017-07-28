@@ -26,7 +26,7 @@ source("personal_loanbook.R")
 options(warn = -1)
 
 ## Increase upload limit
-options(shiny.maxRequestSize=10*1024^2) 
+options(shiny.maxRequestSize = 10*1024^2) 
 
 shinyServer(function(input, output) {
 
@@ -75,7 +75,28 @@ shinyServer(function(input, output) {
               `Loan purpose` = loan_purpose)
   )
   
-  ## Set up reactive filtering variable
+  ## Set up reactive filtering variable - funding circle loanbook dash
+  output$filter_var_picker_fc_dash <- renderUI({
+    if (input$fc_dash_filter %in% "no_filter") {
+      choices <- NULL
+    }else{
+      choices <- fc_loanbook()[[input$fc_dash_filter]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
+    
+    pickerInput(
+      inputId = "fc_dash_filt_var", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
+  
+  ## Set up reactive filtering variable - personal loanbook dash
   output$filter_var_picker <- renderUI({
     if (input$p_dash_filter %in% "no_filter") {
      choices <- NULL
@@ -93,6 +114,40 @@ shinyServer(function(input, output) {
       multiple = TRUE,
       width = "auto"
     )
+  })
+  
+  ##Set up reactive filtering for personal loanbook exploratory
+  output$filter_var_picker_p_exp <- renderUI({
+    if (input$p_exp_filter %in% "no_filter") {
+      choices <- NULL
+    }else{
+      choices <- p_loanbook()[[input$p_exp_filter]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
+    
+    pickerInput(
+      inputId = "p_exp_filt_var", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
+  ## Filter fc loanbook for dashboard
+  filt_fc_loanbook <- reactive({
+    filt_loanbook <- fc_loanbook()
+    
+    if (!input$fc_dash_filter %in% "no_filter") {
+      filt_loanbook <- filt_loanbook %>% 
+        filter_at(.vars = c(input$fc_dash_filter), 
+                  all_vars(. %in% input$fc_dash_filt_var)
+        )
+    }else {
+      filt_loanbook <- filt_loanbook
+    }
   })
   
   ## Clean loan book for dashboard: note repaid loans are dropped here
@@ -125,32 +180,49 @@ if (!input$p_dash_filter %in% "no_filter") {
 
 })
   
+## Filter personal loanbook for exploratory
+  filt_p_loanbook <- reactive({
+    filt_loanbook <- p_loanbook()
+    
+    if (!input$p_exp_filter %in% "no_filter") {
+      filt_loanbook <- filt_loanbook %>% 
+        filter_at(.vars = c(input$p_exp_filter), 
+                  all_vars(. %in% input$p_exp_filt_var)
+        )
+    }else {
+      filt_loanbook <- filt_loanbook
+    }
+    
+  })
+  
   ##Summary stats
   fc_sumstats <- reactive(
-    summary_stats(fc_loanbook())
+    summary_stats(filt_fc_loanbook())
   )
 
   ##Summary stats
   p_sumstats <- reactive(
-    summary_stats(p_loanbook())
+    summary_stats(filt_p_loanbook())
   )
   
   ## Exploratory plots
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(
     if (input$fc_yaxis %in% "defaulted") {
-      fc_loanbook() %>% 
+      filt_fc_loanbook() %>% 
         filter(status %in% "defaulted") %>% 
         mutate(defaulted = principal_remaining) %>% 
       plot_by_date( 
                    by = "defaulted", 
                    strat = input$fc_strat_var,
+                   facet = input$fc_facet_var,
                    plotly = TRUE,
                    round_date = input$fc_round_date)
     }else{
-      plot_by_date(fc_loanbook(), 
+      plot_by_date(filt_fc_loanbook(), 
                    by = input$fc_yaxis, 
                    strat = input$fc_strat_var,
+                   facet = input$fc_facet_var,
                    plotly = TRUE,
                    round_date = input$fc_round_date)
     }
@@ -159,18 +231,20 @@ if (!input$p_dash_filter %in% "no_filter") {
   
   output$p_plottotal <- renderPlotly(
     if (input$p_yaxis %in% "defaulted") {
-      p_loanbook() %>% 
+      filt_p_loanbook() %>% 
         filter(status %in% "defaulted") %>% 
         mutate(defaulted = principal_remaining) %>% 
         plot_by_date( 
           by = "defaulted", 
           strat = input$p_strat_var,
+          facet = input$p_facet_var,
           plotly = TRUE,
           round_date = input$p_round_date)
     }else{
-      plot_by_date(p_loanbook(), 
+      plot_by_date(filt_p_loanbook(), 
                    by = input$p_yaxis, 
                    strat = input$p_strat_var,
+                   facet = input$p_facet_var,
                    plotly = TRUE,
                    round_date = input$p_round_date)
     }
@@ -180,17 +254,19 @@ if (!input$p_dash_filter %in% "no_filter") {
   ## Plot amount as violin
   output$fc_plotdist <- renderPlotly(
     if (input$fc_yaxis %in% "defaulted") {
-      fc_loanbook() %>% 
+      filt_fc_loanbook() %>% 
         filter(status %in% "defaulted") %>% 
         mutate(defaulted = principal_remaining) %>% 
         plot_dist( 
           by = "defaulted", 
           strat = input$fc_strat_var,
+          facet = input$fc_facet_var,
           plotly = TRUE)
     }else{
-      plot_dist(fc_loanbook(), 
+      plot_dist(filt_fc_loanbook(), 
                    by = input$fc_yaxis, 
                    strat = input$fc_strat_var,
+                   facet = input$fc_facet_var,
                    plotly = TRUE)
     }
     
@@ -198,17 +274,19 @@ if (!input$p_dash_filter %in% "no_filter") {
   
   output$p_plotdist <- renderPlotly(
     if (input$p_yaxis %in% "defaulted") {
-      p_loanbook() %>% 
+      filt_p_loanbook() %>% 
         filter(status %in% "defaulted") %>% 
         mutate(defaulted = principal_remaining) %>% 
         plot_dist( 
           by = "defaulted", 
           strat = input$p_strat_var,
+          facet = input$p_facet_var,
           plotly = TRUE)
     }else{
-      plot_dist(p_loanbook(), 
+      plot_dist(filt_p_loanbook(), 
                 by = input$p_yaxis, 
                 strat = input$p_strat_var,
+                facet = input$p_facet_var,
                 plotly = TRUE)
     }
     
@@ -216,19 +294,21 @@ if (!input$p_dash_filter %in% "no_filter") {
   
   ## Plot variable scatter
   output$fc_plotscatter <- renderPlotly(
-plot_scatter(fc_loanbook(), 
+plot_scatter(filt_fc_loanbook(), 
                  by = input$fc_yaxis, 
                  also_by = input$fc_com_var,
                  strat = input$fc_strat_var,
+                 facet = input$fc_facet_var,
                  plotly = TRUE)
   )
 
   
   output$p_plotscatter <- renderPlotly(
-    plot_scatter(p_loanbook(), 
+    plot_scatter(filt_p_loanbook(), 
                  by = input$p_yaxis, 
                  also_by = input$p_com_var,
                  strat = input$p_strat_var,
+                 facet = input$p_facet_var,
                  plotly = TRUE,
                  alpha = 0.8)
   )
