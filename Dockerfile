@@ -9,6 +9,7 @@ RUN apt-get update && \
     libssh2-1-dev \
     libnlopt0 \
     libnlopt-dev \
+    libudunits2-dev \
     && apt-get clean
 
 ## install igraph due to CRAN bug from github
@@ -27,6 +28,7 @@ RUN install2.r --error \
      shinydashboard \
      shinyBS \
      shinyWidgets \
+     tidyverse \
      DT \
      rmarkdown \
      e1071 \
