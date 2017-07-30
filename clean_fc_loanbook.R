@@ -43,7 +43,10 @@ load_clean_loanbook <- function(loanbook_path) {
            
     ## Add repayments made
     loanbook <- loanbook %>% 
-      mutate(repayments_made = term - payments_remaining)
+      mutate(repayments_made = term - payments_remaining) %>% 
+      mutate(repayments_made = repayments_made %>% 
+               factor(ordered = TRUE)
+               )
   
   ## Change loan term to an ordinal factor
   loanbook <- loanbook %>% 
