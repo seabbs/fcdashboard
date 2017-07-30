@@ -14,6 +14,7 @@ RUN apt-get update && \
 RUN install2.r --error \
       --deps TRUE \
       pkgconfig \
+      irlba \
       remotes
 
 RUN installGithub.r igraph/rigraph \

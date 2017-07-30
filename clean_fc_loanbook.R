@@ -33,12 +33,12 @@ load_clean_loanbook <- function(loanbook_path) {
   ## relevel credit band
   loanbook <- loanbook %>% 
     mutate(credit_band = credit_band %>%
-             factor(levels =c('A+ (Very low risk)', 
-                              'A (Low risk)', 
-                              'B (Below average risk)', 
-                              'C (Average risk)', 
-                              'D', 
-                              'E')
+             factor(levels = c('A+ (Very low risk)', 
+                               'A (Low risk)', 
+                               'B (Below average risk)', 
+                               'C (Average risk)', 
+                               'D', 
+                               'E')
              ))
            
     ## Add repayments made
@@ -54,8 +54,9 @@ load_clean_loanbook <- function(loanbook_path) {
   
   ##Add variables
   loanbook <- loanbook %>% 
-    mutate(defaulted = principal_remaining %>% 
-             replace(!(status %in% "defaulted"), 0),
+    mutate(year = lubridate::year(loan_accepted_date) %>% factor,
+           defaulted = principal_remaining %>% 
+           replace(!(status %in% "defaulted"), 0),
            defaulted_by_loan_amount = defaulted,
            principal_remaining_by_loan_amount = principal_remaining)
   return(loanbook)

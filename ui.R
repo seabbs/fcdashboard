@@ -96,7 +96,8 @@ selectInput("fc_yaxis",
                                     `Repayments made` = "repayments_made",
                                     `Whole loan` = "whole_loan",
                                     `Repayment type` = "repayment_type",
-                                    `Security taken` = "security_taken"
+                                    `Security taken` = "security_taken",
+                                    Year = "year"
                                )
                                
                    ),
@@ -115,7 +116,8 @@ selectInput("fc_yaxis",
                                      `Repayments made` = "repayments_made",
                                      `Whole loan` = "whole_loan",
                                      `Repayment type` = "repayment_type",
-                                     `Security taken` = "security_taken"
+                                     `Security taken` = "security_taken",
+                                     Year = "year"
                                 )
                                 
                   ),
@@ -134,7 +136,8 @@ selectInput("fc_yaxis",
                        `Repayments made` = "repayments_made",
                        `Whole loan` = "whole_loan",
                        `Repayment type` = "repayment_type",
-                       `Security taken` = "security_taken"
+                       `Security taken` = "security_taken",
+                        Year = "year"
                     )),
                   conditionalPanel(condition = "input.fc_dash_filter != 'no_filter'",
                                    uiOutput("filter_var_picker_fc_dash")
@@ -154,7 +157,8 @@ selectInput("fc_yaxis",
                                    `Repayments made` = "repayments_made",
                                    `Whole loan` = "whole_loan",
                                    `Repayment type` = "repayment_type",
-                                   `Security taken` = "security_taken"
+                                   `Security taken` = "security_taken",
+                                   Year = "year"
                               )),
                   conditionalPanel(condition = "input.fc_dash_filter_2 != 'no_filter'",
                                    uiOutput("filter_var_picker_fc_dash_2")
@@ -189,7 +193,8 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                  Year = "year"
                              )
                              
                  ),
@@ -208,7 +213,8 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                  Year = "year"
                              )
                              
                  ),
@@ -227,7 +233,8 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                   Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_exp_filter != 'no_filter'",
                                   uiOutput("filter_var_picker_p_exp")
@@ -247,7 +254,8 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                   Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_exp_filter_2 != 'no_filter'",
                                   uiOutput("filter_var_picker_p_exp_2")
@@ -282,7 +290,8 @@ conditionalPanel(condition = 'input.menu == "fc_pca"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                   Year = "year"
                              ))),
 
 conditionalPanel(condition = 'input.menu == "p_pca"',
@@ -315,7 +324,8 @@ conditionalPanel(condition = 'input.menu == "p_pca"',
                                   `Repayments made` = "repayments_made",
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
-                                  `Security taken` = "security_taken"
+                                  `Security taken` = "security_taken",
+                                   Year = "year"
                              ))),
 conditionalPanel(condition = 'input.menu == "p_dashboard"',
                  selectInput("p_dash_strat", 
@@ -335,7 +345,8 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Repayments left` = "`Repayments left`",
                                   `Percentage repaid` = "`Percentage repaid`",
                                   `Repayment type` = "`Repayment type`",
-                                  `Security taken` = "`Security taken`"
+                                  `Security taken` = "`Security taken`",
+                                   Year = "Year"
                              )),
                  selectInput("p_dash_facet", 
                              "Variable to facet by:",
@@ -355,7 +366,8 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Repayments left` = "`Repayments left`",
                                   `Percentage repaid` = "`Percentage repaid`",
                                   `Repayment type` = "`Repayment type`",
-                                  `Security taken` = "`Security taken`"
+                                  `Security taken` = "`Security taken`",
+                                   Year = "Year"
                              )),
                  selectInput("p_dash_filter", 
                              "Variable to filter by:",
@@ -375,7 +387,8 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Repayments left` = "Repayments left",
                                   `Percentage repaid` = "Percentage repaid",
                                   `Repayment type` = "Repayment type",
-                                  `Security taken` = "Security taken"
+                                  `Security taken` = "Security taken", 
+                                   Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_dash_filter != 'no_filter'",
                                   uiOutput("filter_var_picker")
@@ -392,13 +405,14 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Next payment date` = 
                                     "Next payment date",
                                   `Loan status` = "Loan status",
-                                  Region = "Region",
+                                   Region = "Region",
                                   `Loan term` = "Loan term",
                                   `Repayments made` = "Repayments made",
                                   `Repayments left` = "Repayments left",
                                   `Percentage repaid` = "Percentage repaid",
                                   `Repayment type` = "Repayment type",
-                                  `Security taken` = "Security taken"
+                                  `Security taken` = "Security taken",
+                                   Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_dash_filter_2 != 'no_filter'",
                                   uiOutput("filter_var_picker_2")

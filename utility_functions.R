@@ -80,7 +80,7 @@ plot_by_date <- function(df,
     list(X = by, Y = strat, Fa = facet), {
       df <- df %>% 
         mutate(`Loan Acceptance` = 
-                 lubridate::round_date(loan_accepted_date, unit = round_date))
+                 lubridate::floor_date(loan_accepted_date, unit = round_date))
       
       if (!facet %in% "no_facet") {
         df <- df %>% dplyr::group_by(`Loan Acceptance`, Y, Fa)

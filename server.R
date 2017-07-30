@@ -68,11 +68,12 @@ shinyServer(function(input, output) {
     combined_loanbook() %>% 
       filter(invested_in %in% "Yes") %>% 
       mutate(`Loan ID` = id) %>% 
-      mutate(  Region = region_name,
-              `Repayment type` = repayment_type,
-              `Security taken` = security_taken,
-              `Loan term` = term,
-              `Loan purpose` = loan_purpose)
+      mutate(Region = region_name,
+             `Repayment type` = repayment_type,
+             `Security taken` = security_taken,
+             `Loan term` = term,
+             `Loan purpose` = loan_purpose,
+             Year = year)
   )
   
   ## Set up reactive filtering variable - funding circle loanbook dash
@@ -226,7 +227,7 @@ clean_loanbook <- p_loanbook() %>%
              `Repayments made`, `Repayments left`, `Percentage repaid`,
              `Principal remaining`, Rate, `Next payment date`,
              `Loan term`, `Loan purpose`, Region, `Repayment type`, 
-             `Security taken`)
+             `Security taken`, Year)
 
 if (input$filter_repaid) {
   clean_loanbook <-  clean_loanbook  %>% 
