@@ -52,5 +52,11 @@ load_clean_loanbook <- function(loanbook_path) {
   loanbook <- loanbook %>% 
     mutate(term = term %>% factor(ordered = TRUE))
   
+  ##Add variables
+  loanbook <- loanbook %>% 
+    mutate(defaulted = principal_remaining %>% 
+             replace(!(status %in% "defaulted"), 0),
+           defaulted_by_loan_amount = defaulted,
+           principal_remaining_by_loan_amount = principal_remaining)
   return(loanbook)
 }

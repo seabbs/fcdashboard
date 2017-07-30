@@ -31,7 +31,7 @@ plot_loanbook_summary <- function(df,
     size_point <- 2
   }
   
-  p <- df %>% 
+  p <- df %>%
     ggplot(aes_string(x = strat, y = yvar, colour = strat)) + 
     geom_segment(aes_string(xend = strat, yend = 0)) + 
     geom_point(size = size_point)
@@ -83,19 +83,31 @@ plot_by_date <- function(df,
       }else{
         df <- df %>% dplyr::group_by(`Loan Acceptance`, Y)
       }
-        df <- df  %>% 
-        dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
-        na.omit
       
+      if (str_detect(by, "by_loan_amount")) {
+        df <- df  %>% 
+          dplyr::summarise(X =  100 * sum(X, na.rm = TRUE)/sum(loan_amount)) %>%
+          na.omit
+      }else{
+        df <- df  %>% 
+          dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
+          na.omit
+      }
+
       p <- df %>% 
         ggplot(aes(x = `Loan Acceptance`,
                    y = X, 
                    colour = Y)) +
-        ylab(paste0(by, " (£, Millions)")) +
         geom_point() +
         geom_line() +
         theme_minimal() +
         theme(legend.position = "bottom")
+      
+      if (str_detect(by, "by_loan_amount")) {
+        p <- p + ylab(paste0(by, " (%)")) 
+      }else {
+        p <- p + ylab(paste0(by, " (£, Millions)"))
+      }
       
       if (!facet %in% "no_facet") {
         p <- p + facet_wrap(facet, scales = "fixed")
@@ -121,16 +133,26 @@ plot_dist <- function(df,
                       plotly = TRUE)
   wrapr::let(
     list(X = by, Y = strat), {
-      df <- df %>% 
-        mutate(X = X / 1e3)
-      
+      if (str_detect(by, "by_loan_amount")) {
+        df <- df %>% 
+          mutate(X = 100 * X / loan_amount)
+      }else {
+        df <- df %>% 
+          mutate(X = X / 1e3)
+      }
+
       p <- df %>% 
         ggplot(aes(x = Y, y = X, fill = Y)) +
         geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
-        ylab(paste0(by, " (£, Thousands)")) +
         theme_minimal() +
         theme(axis.text.x = element_text(angle = 45,hjust = 1),
               legend.position = "none")
+      
+      if (str_detect(by, "by_loan_amount")) {
+        p <- p +  ylab(paste0(by, " (%)"))
+      }else{
+       p <- p + ylab(paste0(by, " (£, Thousands)")) 
+      }
       
       if (!facet %in% "no_facet") {
         p <- p + facet_wrap(facet, scales = "fixed")
@@ -160,22 +182,27 @@ plot_scatter <- function(df,
                as.numeric)
   }
   
-  if (by %in% "defaulted" || also_by %in% "defaulted") {
-    df <- df %>% 
-      filter(status %in% "defaulted") %>% 
-      mutate(defaulted = principal_remaining)
-  }
-  
   wrapr::let(
     list(X = by, Y = strat, Z = also_by), {
       
-      
-      p <- df %>%
-        mutate(X = X/1e3) %>% 
+   if (str_detect(by, "by_loan_amount")) {
+     df <- df %>% 
+       mutate(X = 100 * X / loan_amount)
+   }else{
+     df <- df %>%
+       mutate(X = X/1e3)
+   }
+
+      p <- df %>% 
         ggplot(aes(x = X, y = Z, colour = Y)) +
         geom_count(alpha = alpha, show.legend = TRUE) +
-        xlab(paste0(by, " (£, Thousands)")) +
         theme_minimal()
+      
+      if (str_detect(by, "by_loan_amount")) {
+        p <- p + xlab(paste0(by, " (%)"))
+      }else {
+        p <- p + xlab(paste0(by, " (£, Thousands)"))
+      }
       
       if (!facet %in% "no_facet") {
         p <- p + facet_wrap(facet, scales = "fixed")

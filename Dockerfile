@@ -2,7 +2,10 @@
 FROM rocker/shiny:latest
 
 MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
-    
+RUN apt-get install -y \
+    libssl-dev \
+    && apt-get clean
+
 ## Install cran packages
 RUN install2.r --error \
     --deps TRUE \

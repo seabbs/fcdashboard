@@ -297,19 +297,23 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
     }else{
       strat <- c(input$fc_strat_var, input$fc_facet_var)
     }
+ 
+    group_fc_loanbook <- filt_fc_loanbook() %>% 
+      group_by(.dots = strat)
     
-    if (input$fc_yaxis %in% "defaulted") {
-      sum_fc_loanbook <-  filt_fc_loanbook()  %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining)
-    }else{
-      sum_fc_loanbook <-  filt_fc_loanbook()
+    if (str_detect(input$fc_yaxis, "by_loan_amount")) {
+      group_fc_loanbook <- group_fc_loanbook %>% 
+        summarise_at(.vars = input$fc_yaxis,
+                     .funs = funs(100 * sum(.)/sum(loan_amount)) 
+        ) %>% 
+        mutate_at(.vars = input$fc_yaxis, .funs = funs(round(., digits = 1)))
+    }else {
+      group_fc_loanbook <- group_fc_loanbook %>% 
+        summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.)) 
+        ) %>% 
+        mutate_at(.vars = input$fc_yaxis, .funs = funs(round(./1e6, digits = 1)))
     }
-    
-    sum_fc_loanbook %>% 
-      group_by(.dots = strat) %>% 
-      summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.))) %>% 
-      mutate_at(.vars = input$fc_yaxis, .funs = funs(round(./1e6, digits = 1))) %>% 
+    group_fc_loanbook  %>% 
       plot_loanbook_summary(yvar = input$fc_yaxis, 
                               strat = input$fc_strat_var,
                               facet = input$fc_facet_var,
@@ -326,18 +330,24 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
       strat <- c(input$p_strat_var, input$p_facet_var)
     }
     
-    if (input$p_yaxis %in% "defaulted") {
-      sum_p_loanbook <-  filt_p_loanbook()  %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining)
-    }else{
-      sum_p_loanbook <-  filt_p_loanbook()
+    group_p_loanbook <- filt_p_loanbook() %>% 
+      group_by(.dots = strat)
+    
+    if (str_detect(input$p_yaxis, "by_loan_amount")) {
+      group_p_loanbook <-   group_p_loanbook %>% 
+        summarise_at(.vars = input$p_yaxis,
+                     .funs = funs(100 * sum(., na.rm = TRUE)/sum(loan_amount)) 
+        ) %>% 
+        mutate_at(.vars = input$p_yaxis, .funs = funs(round(., digits = 1)))
+    }else {
+      group_p_loanbook <-   group_p_loanbook %>% 
+        summarise_at(.vars = input$p_yaxis, 
+                     .funs = funs(sum(., na.rm = TRUE))
+        ) %>% 
+        mutate_at(.vars = input$p_yaxis, .funs = funs(round(./1e6, digits = 1)))
     }
     
-    sum_p_loanbook %>% 
-      group_by(.dots = strat) %>% 
-      summarise_at(.vars = input$p_yaxis, .funs = funs(sum(.))) %>% 
-      mutate_at(.vars = input$p_yaxis, .funs = funs(round(./1e6, digits = 1))) %>% 
+      group_p_loanbook %>% 
       plot_loanbook_summary(yvar = input$p_yaxis, 
                               strat = input$p_strat_var,
                               facet = input$p_facet_var,
@@ -346,88 +356,39 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
   })
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(
-    if (input$fc_yaxis %in% "defaulted") {
-      filt_fc_loanbook() %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining) %>% 
-      plot_by_date( 
-                   by = "defaulted", 
-                   strat = input$fc_strat_var,
-                   facet = input$fc_facet_var,
-                   plotly = TRUE,
-                   round_date = input$fc_round_date)
-    }else{
       plot_by_date(filt_fc_loanbook(), 
                    by = input$fc_yaxis, 
                    strat = input$fc_strat_var,
                    facet = input$fc_facet_var,
                    plotly = TRUE,
                    round_date = input$fc_round_date)
-    }
 
   )
   
   output$p_plottotal <- renderPlotly(
-    if (input$p_yaxis %in% "defaulted") {
-      filt_p_loanbook() %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining) %>% 
-        plot_by_date( 
-          by = "defaulted", 
-          strat = input$p_strat_var,
-          facet = input$p_facet_var,
-          plotly = TRUE,
-          round_date = input$p_round_date)
-    }else{
       plot_by_date(filt_p_loanbook(), 
                    by = input$p_yaxis, 
                    strat = input$p_strat_var,
                    facet = input$p_facet_var,
                    plotly = TRUE,
                    round_date = input$p_round_date)
-    }
-    
   )
   
   ## Plot amount as violin
   output$fc_plotdist <- renderPlotly(
-    if (input$fc_yaxis %in% "defaulted") {
-      filt_fc_loanbook() %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining) %>% 
-        plot_dist( 
-          by = "defaulted", 
-          strat = input$fc_strat_var,
-          facet = input$fc_facet_var,
-          plotly = TRUE)
-    }else{
       plot_dist(filt_fc_loanbook(), 
                    by = input$fc_yaxis, 
                    strat = input$fc_strat_var,
                    facet = input$fc_facet_var,
                    plotly = TRUE)
-    }
-    
   )
   
   output$p_plotdist <- renderPlotly(
-    if (input$p_yaxis %in% "defaulted") {
-      filt_p_loanbook() %>% 
-        filter(status %in% "defaulted") %>% 
-        mutate(defaulted = principal_remaining) %>% 
-        plot_dist( 
-          by = "defaulted", 
-          strat = input$p_strat_var,
-          facet = input$p_facet_var,
-          plotly = TRUE)
-    }else{
       plot_dist(filt_p_loanbook(), 
                 by = input$p_yaxis, 
                 strat = input$p_strat_var,
                 facet = input$p_facet_var,
                 plotly = TRUE)
-    }
-    
   )
   
   ## Plot variable scatter

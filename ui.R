@@ -71,11 +71,15 @@ selectInput("fc_yaxis",
                                "Variable to summarise:",
                                list(`Loan amount` = 
                                       "loan_amount",
-                                    Recoveries = 
-                                      "recoveries",
                                     `Principal remaining` = 
                                       "principal_remaining",
-                                    Defaulted = "defaulted"
+                                    `Principal remaining/Loan amount` = 
+                                      "principal_remaining_by_loan_amount",
+                                    Defaulted = "defaulted",
+                                    `Defaulted/Loan Amount` = 
+                                      "defaulted_by_loan_amount",
+                                    Recoveries = 
+                                      "recoveries"
                                )
                    ),
                    selectInput("fc_strat_var", 
@@ -160,11 +164,15 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                              "Variable to summarise:",
                              list(`Loan amount` = 
                                     "loan_amount",
-                                  Recoveries = 
-                                    "recoveries",
                                   `Principal remaining` = 
                                     "principal_remaining",
-                                  Defaulted = "defaulted"
+                                  `Principal remaining/Loan amount` = 
+                                    "principal_remaining_by_loan_amount",
+                                  Defaulted = "defaulted",
+                                  `Defaulted/Loan Amount` = 
+                                    "defaulted_by_loan_amount",
+                                  Recoveries = 
+                                    "recoveries"
                              )
                  ),
                  selectInput("p_strat_var", 
