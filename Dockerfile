@@ -6,11 +6,14 @@ MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
 RUN apt-get update && \
     apt-get install -y \
     libssl-dev \
+    libnlopt0 \
+    libnlopt-dev \
     && apt-get clean
 
 ## install igraph due to CRAN bug from github
 RUN install2.r --error \
       --deps TRUE \
+      pkgconfig \
       remotes
 
 RUN installGithub.r igraph/rigraph \
