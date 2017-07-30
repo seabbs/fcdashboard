@@ -11,7 +11,6 @@ RUN apt-get install -y \
     libjpeg-dev \
     libssh2-1-dev \
     libcurl4-openssl-dev \
-    less git make wget nano \
     && apt-get clean
     
 ## Install cran packages
