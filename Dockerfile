@@ -9,6 +9,10 @@ RUN apt-get update && \
     && apt-get clean
 
 ## install igraph due to CRAN bug from github
+RUN install2.r --error \
+      --deps TRUE \
+      remotes
+
 RUN installGithub.r igraph/rigraph \
 && rm -rf /tmp/downloaded_packages/
 
@@ -26,8 +30,7 @@ RUN install2.r --error \
      plotly \
      lubridate \
      wrapr \
-     stringr \
-     remotes
+     stringr 
 
 RUN rm -r /srv/shiny-server/*
 ADD . /srv/shiny-server/fcdashboard
