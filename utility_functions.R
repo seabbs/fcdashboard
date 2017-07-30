@@ -54,7 +54,7 @@ plot_loanbook_summary <- function(df,
   
   if (!facet %in% "no_facet") {
     p <- p +
-      facet_wrap(facet, scales = "free_y")
+      facet_wrap(facet, scales = "fixed")
   }
   
   if (plotly) {
@@ -98,7 +98,7 @@ plot_by_date <- function(df,
         theme(legend.position = "bottom")
       
       if (!facet %in% "no_facet") {
-        p <- p + facet_wrap(facet, scales = "free_y")
+        p <- p + facet_wrap(facet, scales = "fixed")
       }
     }
   )
@@ -133,7 +133,7 @@ plot_dist <- function(df,
               legend.position = "none")
       
       if (!facet %in% "no_facet") {
-        p <- p + facet_wrap(facet, scales = "free_y")
+        p <- p + facet_wrap(facet, scales = "fixed")
       }
       
       if (plotly) {
