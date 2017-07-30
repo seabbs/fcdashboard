@@ -8,6 +8,10 @@ RUN apt-get update && \
     libssl-dev \
     && apt-get clean
 
+## install igraph due to CRAN bug from github
+RUN installGithub.r igraph/rigraph \
+&& rm -rf /tmp/downloaded_packages/
+
 ## Install cran packages
 RUN install2.r --error \
     --deps TRUE \
