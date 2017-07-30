@@ -6,6 +6,7 @@ MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
 RUN apt-get update && \
     apt-get install -y \
     libssl-dev \
+    libssh2-1-dev \
     libnlopt0 \
     libnlopt-dev \
     && apt-get clean

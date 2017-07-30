@@ -12,6 +12,7 @@ library(plotly)
 library(lubridate)
 library(wrapr)
 library(stringr)
+
 ## Source cleaned data
 source("clean_fc_loanbook.R")
 
