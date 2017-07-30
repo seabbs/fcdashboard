@@ -108,7 +108,7 @@ p_loanbook_overall_sum_info <- function(df,
         replace(!`Loan status` %in% "Late", 0) %>% 
         sum,
       `Amount defaulted (%)` = `Principal remaining` %>%
-        replace(!`Loan status` %in% "Defaulted", 0) %>% 
+        replace(!`Loan status` %in% c("Defaulted", "Bad debt", "Bad Debt"), 0) %>% 
         sum,
       `Number of loans invested in` = n(),
       `Number of loan parts` = sum(`Number of loan parts`),
