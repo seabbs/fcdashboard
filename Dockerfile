@@ -3,6 +3,17 @@ FROM rocker/shiny:latest
 
 MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
 
+RUN apt-get install -y \
+    libnlopt0 \
+    libnlopt-dev \
+    libv8-3.14-dev \
+    librsvg2-dev \
+    libjpeg-dev \
+    libssh2-1-dev \
+    libcurl4-openssl-dev \
+    less git make wget nano \
+    && apt-get clean
+    
 ## Install cran packages
 RUN install2.r --error \
     --deps TRUE \
