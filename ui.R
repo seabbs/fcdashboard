@@ -134,6 +134,26 @@ selectInput("fc_yaxis",
                     )),
                   conditionalPanel(condition = "input.fc_dash_filter != 'no_filter'",
                                    uiOutput("filter_var_picker_fc_dash")
+                  ),
+                  selectInput("fc_dash_filter_2", 
+                              "Second variable to filter by:",
+                              list(`-` = "no_filter",
+                                   `Credit band` = 
+                                     "credit_band",
+                                   Status = 
+                                     "status",
+                                   `Loan purpose` = 
+                                     "loan_purpose",
+                                   Sector = "sector",
+                                   Region = "region_name",
+                                   `Loan term` = "term",
+                                   `Repayments made` = "repayments_made",
+                                   `Whole loan` = "whole_loan",
+                                   `Repayment type` = "repayment_type",
+                                   `Security taken` = "security_taken"
+                              )),
+                  conditionalPanel(condition = "input.fc_dash_filter_2 != 'no_filter'",
+                                   uiOutput("filter_var_picker_fc_dash_2")
                   )),
 conditionalPanel(condition = 'input.menu == "p_exploratory"',
                  selectInput("p_yaxis", 
@@ -203,6 +223,26 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                              )),
                  conditionalPanel(condition = "input.p_exp_filter != 'no_filter'",
                                   uiOutput("filter_var_picker_p_exp")
+                 ),
+                 selectInput("p_exp_filter_2", 
+                             "Second variable to filter by:",
+                             list(`-` = "no_filter",
+                                  `Credit band` = 
+                                    "credit_band",
+                                  Status = 
+                                    "status",
+                                  `Loan purpose` = 
+                                    "loan_purpose",
+                                  Sector = "sector",
+                                  Region = "region_name",
+                                  `Loan term` = "term",
+                                  `Repayments made` = "repayments_made",
+                                  `Whole loan` = "whole_loan",
+                                  `Repayment type` = "repayment_type",
+                                  `Security taken` = "security_taken"
+                             )),
+                 conditionalPanel(condition = "input.p_exp_filter_2 != 'no_filter'",
+                                  uiOutput("filter_var_picker_p_exp_2")
                  )),
 conditionalPanel(condition = 'input.menu == "fc_pca"',
                  sliderInput(inputId = "fc_no_pca", 
@@ -331,6 +371,29 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                              )),
                  conditionalPanel(condition = "input.p_dash_filter != 'no_filter'",
                                   uiOutput("filter_var_picker")
+                 ),
+                 selectInput("p_dash_filter_2", 
+                             "Second variable to filter by:",
+                             list(`-` = "no_filter",
+                                  Risk = 
+                                    "Risk",
+                                  Rate = "Rate",
+                                  `Loan purpose` = 
+                                    "Loan purpose",
+                                  Sector = "Sector",
+                                  `Next payment date` = 
+                                    "Next payment date",
+                                  `Loan status` = "Loan status",
+                                  Region = "Region",
+                                  `Loan term` = "Loan term",
+                                  `Repayments made` = "Repayments made",
+                                  `Repayments left` = "Repayments left",
+                                  `Percentage repaid` = "Percentage repaid",
+                                  `Repayment type` = "Repayment type",
+                                  `Security taken` = "Security taken"
+                             )),
+                 conditionalPanel(condition = "input.p_dash_filter_2 != 'no_filter'",
+                                  uiOutput("filter_var_picker_2")
                  ),
                  checkboxInput("show_bad_debt_opts",
                                "Edit bad debt estimates:",

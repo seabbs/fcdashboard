@@ -80,7 +80,7 @@ shinyServer(function(input, output) {
     if (input$fc_dash_filter %in% "no_filter") {
       choices <- NULL
     }else{
-      choices <- fc_loanbook()[[input$fc_dash_filter]] %>%
+      choices <- clean_fc_loanbook()[[input$fc_dash_filter]] %>%
         as.character %>% 
         unique %>% 
         as.list
@@ -88,6 +88,25 @@ shinyServer(function(input, output) {
     
     pickerInput(
       inputId = "fc_dash_filt_var", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
+  output$filter_var_picker_fc_dash_2 <- renderUI({
+    if (input$fc_dash_filter_2 %in% "no_filter") {
+      choices <- NULL
+    }else{
+      choices <- clean_fc_loanbook()[[input$fc_dash_filter_2]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
+    
+    pickerInput(
+      inputId = "fc_dash_filt_var_2", 
       label = "Select/deselect all options", 
       choices = choices, options = list(`actions-box` = TRUE),
       multiple = TRUE,
@@ -116,6 +135,25 @@ shinyServer(function(input, output) {
     )
   })
   
+  output$filter_var_picker_2 <- renderUI({
+    if (input$p_dash_filter_2 %in% "no_filter") {
+      choices <- NULL
+    }else{
+      choices <- p_loanbook()[[input$p_dash_filter_2]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
+    
+    pickerInput(
+      inputId = "p_dash_filt_var_2", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
   ##Set up reactive filtering for personal loanbook exploratory
   output$filter_var_picker_p_exp <- renderUI({
     if (input$p_exp_filter %in% "no_filter") {
@@ -136,6 +174,25 @@ shinyServer(function(input, output) {
     )
   })
   
+  output$filter_var_picker_p_exp_2 <- renderUI({
+    if (input$p_exp_filter_2 %in% "no_filter") {
+      choices <- NULL
+    }else{
+      choices <- p_loanbook()[[input$p_exp_filter_2]] %>%
+        as.character %>% 
+        unique %>% 
+        as.list
+    }
+    
+    pickerInput(
+      inputId = "p_exp_filt_var_2", 
+      label = "Select/deselect all options", 
+      choices = choices, options = list(`actions-box` = TRUE),
+      multiple = TRUE,
+      width = "auto"
+    )
+  })
+  
   ## Filter fc loanbook for dashboard
   filt_fc_loanbook <- reactive({
     filt_loanbook <- fc_loanbook()
@@ -144,6 +201,15 @@ shinyServer(function(input, output) {
       filt_loanbook <- filt_loanbook %>% 
         filter_at(.vars = c(input$fc_dash_filter), 
                   all_vars(. %in% input$fc_dash_filt_var)
+        )
+    }else {
+      filt_loanbook <- filt_loanbook
+    }
+    
+    if (!input$fc_dash_filter_2 %in% "no_filter") {
+      filt_loanbook <- filt_loanbook %>% 
+        filter_at(.vars = c(input$fc_dash_filter_2), 
+                  all_vars(. %in% input$fc_dash_filt_var_2)
         )
     }else {
       filt_loanbook <- filt_loanbook
@@ -178,6 +244,15 @@ if (!input$p_dash_filter %in% "no_filter") {
   clean_loanbook <- clean_loanbook
 }
 
+if (!input$p_dash_filter_2 %in% "no_filter") {
+  clean_loanbook <- clean_loanbook %>% 
+    filter_at(.vars = c(input$p_dash_filter_2), 
+              all_vars(. %in% input$p_dash_filt_var_2)
+    )
+}else {
+  clean_loanbook <- clean_loanbook
+}
+
 })
   
 ## Filter personal loanbook for exploratory
@@ -188,6 +263,15 @@ if (!input$p_dash_filter %in% "no_filter") {
       filt_loanbook <- filt_loanbook %>% 
         filter_at(.vars = c(input$p_exp_filter), 
                   all_vars(. %in% input$p_exp_filt_var)
+        )
+    }else {
+      filt_loanbook <- filt_loanbook
+    }
+    
+    if (!input$p_exp_filter_2 %in% "no_filter") {
+      filt_loanbook <- filt_loanbook %>% 
+        filter_at(.vars = c(input$p_exp_filter_2), 
+                  all_vars(. %in% input$p_exp_filt_var_2)
         )
     }else {
       filt_loanbook <- filt_loanbook
