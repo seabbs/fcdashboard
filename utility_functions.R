@@ -43,8 +43,12 @@ plot_loanbook_summary <- function(df,
   }
   
   if (scaled_to_mil) {
-    p <- p +
-      ylab(paste0(yvar, " (£, Millions)"))
+    if (str_detect(by, "by_loan_amount")) {
+      p <- p + ylab(paste0(yvar, " (%)"))
+    }else {
+      p <- p +
+        ylab(paste0(yvar, " (£, Millions)"))
+    }
   }
   
   p <- p +

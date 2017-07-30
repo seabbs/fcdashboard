@@ -48,7 +48,7 @@ Finally save the funding circle loanbook as `loanbook.csv`, and your personal lo
 
 [Docker](https://www.docker.com/what-docker) is a container software that seeks to eliminate "works on my machine" issues. For installation and set up instructions see [here](https://www.docker.com/community-edition). 
 
-This docker container is analysis based on the [tidyverse](https://hub.docker.com/r/rocker/shiny/) docker image, see [here](https://github.com/rocker-org/shiny) for instructions on use. To run the docker image run:
+This docker container is analysis based on the [shiny](https://hub.docker.com/r/rocker/shiny/) docker image, see [here](https://github.com/rocker-org/shiny) for instructions on use. To run the docker image run:
 
 ```{bash, eval = FALSE}
 docker pull seabbs/fcdashboard

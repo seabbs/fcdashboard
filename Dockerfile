@@ -2,7 +2,9 @@
 FROM rocker/shiny:latest
 
 MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
-RUN apt-get install -y \
+
+RUN apt-get update && \
+    apt-get install -y \
     libssl-dev \
     && apt-get clean
 
