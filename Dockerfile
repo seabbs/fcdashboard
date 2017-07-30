@@ -2,11 +2,6 @@
 FROM rocker/shiny:latest
 
 MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
-
-RUN apt-get install -y \
-    libnlopt0 \
-    libnlopt-dev \
-    && apt-get clean
     
 ## Install cran packages
 RUN install2.r --error \
