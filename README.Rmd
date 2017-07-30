@@ -20,6 +20,9 @@ FC Dashboard can also be used as a personal dashboard to enable you to better un
 
 ## Installing the shiny app locally
 
+
+### Manual Install
+
 To install and run the shiny app locally on your own computer you will need to first install [R](https://www.r-project.org/), it is also suggested that you install [Rstudio](https://www.rstudio.com/products/rstudio/download/). After downloading the source code from [this repository](https://www.github.com/seabbs/fcdashboard) click on the `fcdashboard.Rprof` file, this will open an Rstudio window. Type the following code into the command line;
 
 ```{r, eval = FALSE}
@@ -40,3 +43,19 @@ install.packages("stringr")
 ```
 
 Finally save the funding circle loanbook as `loanbook.csv`, and your personal loanbook as `personal_loanbook.csv` in the fcdashboard folder. To run the app open the `ui.R` file and press run, depending on your computer this may take some time. Enjoy exploring the funding circle loanbook!
+
+### Using Docker
+
+[Docker](https://www.docker.com/what-docker) is a container software that seeks to eliminate "works on my machine" issues. For installation and set up instructions see [here](https://www.docker.com/community-edition). 
+
+This docker container is analysis based on the [tidyverse](https://hub.docker.com/r/rocker/shiny/) docker image, see [here](https://github.com/rocker-org/shiny) for instructions on use. To run the docker image run:
+
+```{bash, eval = FALSE}
+docker pull seabbs/fcdashboard
+docker run --rm -p 3838:3838 seabbs/fcdashboard
+```
+
+The shiny server can be found on port `:3838` at your local machines ip (or localhost on windows). 
+
+
+
