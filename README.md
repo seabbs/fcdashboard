@@ -44,4 +44,4 @@ docker pull seabbs/fcdashboard
 docker run --rm -p 3838:3838 seabbs/fcdashboard
 ```
 
-The shiny server can be found on port `:3838` at your local machines ip (or localhost on windows), fcdashboard can be found at `:3838/fcdashboard`.
+The shiny server can be found on port `:3838` at your local machines ip (or localhost on windows), fcdashboard can be found at `your-ip:3838/fcdashboard`.
