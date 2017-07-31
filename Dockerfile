@@ -11,7 +11,7 @@ RUN apt-get update && \
     libnlopt-dev \
     libudunits2-dev \
     libxml2-dev \
-    libgdal1-dev \
+    libgdal-dev \
     && apt-get clean
 
 ## install igraph due to CRAN bug from github
