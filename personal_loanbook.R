@@ -11,7 +11,7 @@ library(stringr)
 ## Load and clean personal loanbook
 loan_clean_personal_loanbook <- function(personal_loanbook_path) {
   
-  if(is.null(personal_loanbook_path)) {
+  if (is.null(personal_loanbook_path)) {
     if (file.exists("personal_loanbook.csv")) {
       path <- "personal_loanbook.csv"
     }else {

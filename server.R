@@ -308,7 +308,34 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
                      .funs = funs(100 * sum(.)/sum(loan_amount)) 
         ) %>% 
         mutate_at(.vars = input$fc_yaxis, .funs = funs(round(., digits = 1)))
-    }else {
+    }else if (str_detect(input$fc_yaxis, "by_facet")) {
+      
+      if (input$fc_facet_var %in% "no_facet") {
+        total_facet <- sum(filt_fc_loanbook()[[input$fc_yaxis]], na.rm = TRUE)
+
+        group_fc_loanbook <- group_fc_loanbook %>% 
+          summarise_at(.vars = input$fc_yaxis,
+                       .funs = funs(100 * sum(.)/total_facet) 
+          )
+      }else{
+        total_facet <- filt_fc_loanbook() %>% 
+          group_by(.dots = strat) %>% 
+          summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.))) %>% 
+          ungroup %>% 
+          rename_at(.vars =  input$fc_yaxis, .funs = (function(.) {"facet_sum"}))
+        
+        group_fc_loanbook <- group_fc_loanbook %>% 
+          full_join(total_facet) %>% 
+          group_by(.dots = input$fc_strat_var) %>% 
+          summarise_at(.vars = input$fc_yaxis,
+                       .funs = funs(100 * sum(.)/facet_sum[1]) 
+          )
+      }
+    
+    group_fc_loanbook <- group_fc_loanbook %>%
+      mutate_at(.vars = input$fc_yaxis, .funs = funs(round(., digits = 1)))
+    
+    }else{
       group_fc_loanbook <- group_fc_loanbook %>% 
         summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.)) 
         ) %>% 
@@ -340,6 +367,33 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
                      .funs = funs(100 * sum(., na.rm = TRUE)/sum(loan_amount)) 
         ) %>% 
         mutate_at(.vars = input$p_yaxis, .funs = funs(round(., digits = 1)))
+    }else if (str_detect(input$p_yaxis, "by_facet")) {
+      
+      if (input$p_facet_var %in% "no_facet") {
+        total_facet <- sum(filt_p_loanbook()[[input$p_yaxis]], na.rm = TRUE)
+        
+        group_p_loanbook <- group_p_loanbook %>% 
+          summarise_at(.vars = input$p_yaxis,
+                       .funs = funs(100 * sum(.)/total_facet) 
+          )
+      }else{
+        total_facet <- filt_p_loanbook() %>% 
+          group_by(.dots = strat) %>% 
+          summarise_at(.vars = input$p_yaxis, .funs = funs(sum(.))) %>% 
+          ungroup %>% 
+          rename_at(.vars =  input$p_yaxis, .funs = (function(.) {"facet_sum"}))
+        
+        group_p_loanbook <- group_p_loanbook %>% 
+          full_join(total_facet) %>% 
+          group_by(.dots = input$p_strat_var) %>% 
+          summarise_at(.vars = input$p_yaxis,
+                       .funs = funs(100 * sum(.)/facet_sum[1]) 
+          )
+      }
+      
+      group_p_loanbook <- group_p_loanbook %>%
+        mutate_at(.vars = input$p_yaxis, .funs = funs(round(., digits = 1)))
+      
     }else {
       group_p_loanbook <-   group_p_loanbook %>% 
         summarise_at(.vars = input$p_yaxis, 

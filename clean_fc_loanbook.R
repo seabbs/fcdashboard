@@ -57,6 +57,7 @@ load_clean_loanbook <- function(loanbook_path) {
     mutate(year = lubridate::year(loan_accepted_date) %>% factor,
            defaulted = principal_remaining %>% 
            replace(!(status %in% "defaulted"), 0),
+           loan_amount_by_facet = loan_amount,
            defaulted_by_loan_amount = defaulted,
            principal_remaining_by_loan_amount = principal_remaining)
   return(loanbook)

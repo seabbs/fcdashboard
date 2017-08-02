@@ -72,6 +72,7 @@ selectInput("fc_yaxis",
                                "Variable to summarise:",
                                list(`Loan amount` = 
                                       "loan_amount",
+                                    `Loan amount/Sum in facet` = "loan_amount_by_facet",
                                     `Principal remaining` = 
                                       "principal_remaining",
                                     `Principal remaining/Loan amount` = 
@@ -169,6 +170,7 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                              "Variable to summarise:",
                              list(`Loan amount` = 
                                     "loan_amount",
+                                  `Loan amount/Sum in facet` = "loan_amount_by_facet",
                                   `Principal remaining` = 
                                     "principal_remaining",
                                   `Principal remaining/Loan amount` = 
