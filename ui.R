@@ -82,9 +82,11 @@ selectInput("fc_yaxis",
                                      Recoveries = "recoveries",
                                     `Recoveries (%)` = "recoveries_by_facet",
                                     `Recoveries/Loan amount` = "recoveries_by_loan_amount",
+                                    `Recoveries/Defaulted` = "recoveries_by_defaulted",
                                      Unrecovered = "unrecovered",
                                     `Unrecovered (%)` = "unrecovered_by_facet",
-                                    `Unrecovered/Loan amount` = "unrecovered_by_loan_amount"
+                                    `Unrecovered/Loan amount` = "unrecovered_by_loan_amount",
+                                    `Unrecovered/Defaulted` = "unrecovered_by_defaulted"
                                ),
             selected =  "loan_amount"
                    ),
@@ -188,9 +190,11 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                    Recoveries = "recoveries",
                                   `Recoveries (%)` = "recoveries_by_facet",
                                   `Recoveries/Loan amount` = "recoveries_by_loan_amount",
+                                  `Recoveries/Defaulted` = "recoveries_by_defaulted",
                                    Unrecovered = "unrecovered",
                                   `Unrecovered (%)` = "unrecovered_by_facet",
-                                  `Unrecovered/Loan amount` = "unrecovered_by_loan_amount"
+                                  `Unrecovered/Loan amount` = "unrecovered_by_loan_amount",
+                                  `Unrecovered/Defaulted` = "unrecovered_by_defaulted"
                              ),
                              selected =  "loan_amount"
                  ),

@@ -45,6 +45,13 @@ summarise_loanbook <- function(df = NULL,
       ) %>% 
       mutate_at(.vars = yvar, .funs = funs(round(., digits = 1)))
     
+  }else if (str_detect(yvar, "by_defaulted")) {
+    group_df <- group_df %>% 
+      summarise_at(.vars = yvar,
+                   .funs = funs(100 * sum(.)/sum(defaulted)) 
+      ) %>% 
+      mutate_at(.vars = yvar, .funs = funs(round(., digits = 1)))
+    
   }else if (str_detect(yvar, "by_facet")) {
     ##Summarise, normalising by within facet total
     if (facet %in% "no_facet" && is.null(xvar)) {
@@ -126,7 +133,9 @@ plot_loanbook_summary <- function(df,
   }
   
   if (scaled_to_mil) {
-    if (str_detect(yvar, "by_loan_amount") | str_detect(yvar, "by_facet")) {
+    if (str_detect(yvar, "by_loan_amount") | 
+        str_detect(yvar, "by_facet") |
+        str_detect(yvar, "by_defaulted")) {
       p <- p + ylab(paste0(yvar, " (%)"))
     }else if (str_detect(yvar, "no_loans")) {
       p <- p + ylab(paste0(yvar, " (no.)"))
@@ -183,7 +192,9 @@ plot_by_date <- function(df,
         theme_minimal() +
         theme(legend.position = "bottom")
       
-      if (str_detect(by, "by_loan_amount") || str_detect(by, "by_facet")) {
+      if (str_detect(by, "by_loan_amount") || 
+          str_detect(by, "by_facet") || 
+          str_detect(by, "by_defaulted")) {
         p <- p + ylab(paste0(by, " (%)")) 
       }else if (str_detect(by, "no_loans")) {
         p <- p + ylab(paste0(by, " (no.)"))
@@ -214,6 +225,9 @@ plot_dist <- function(df,
       if (str_detect(by, "by_loan_amount")) {
         df <- df %>% 
           mutate(X = 100 * X / loan_amount)
+      }else if (str_detect(by, "by_defaulted")) {
+        df <- df %>% 
+          mutate(X = 100 * X / defaulted)
       }else {
         df <- df %>% 
           mutate(X = X / 1e3)
@@ -226,7 +240,7 @@ plot_dist <- function(df,
         theme(axis.text.x = element_text(angle = 45,hjust = 1),
               legend.position = "none")
       
-      if (str_detect(by, "by_loan_amount")) {
+      if (str_detect(by, "by_loan_amount") | str_detect(by, "by_defaulted")) {
         p <- p +  ylab(paste0(by, " (%)"))
       }else{
        p <- p + ylab(paste0(by, " (£, Thousands)")) 
@@ -268,6 +282,9 @@ plot_scatter <- function(df,
    if (str_detect(by, "by_loan_amount")) {
      df <- df %>% 
        mutate(X = 100 * X / loan_amount)
+   }else if (str_detect(by, "by_defaulted")) {
+     df <- df %>% 
+       mutate(X = 100 * X / defaulted)
    }else{
      df <- df %>%
        mutate(X = X/1e3)
@@ -278,7 +295,7 @@ plot_scatter <- function(df,
         geom_count(alpha = alpha, show.legend = TRUE) +
         theme_minimal()
       
-      if (str_detect(by, "by_loan_amount")) {
+      if (str_detect(by, "by_loan_amount") | str_detect(by, "by_defaulted")) {
         p <- p + xlab(paste0(by, " (%)"))
       }else {
         p <- p + xlab(paste0(by, " (£, Thousands)"))
