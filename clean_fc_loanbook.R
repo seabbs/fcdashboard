@@ -54,11 +54,31 @@ load_clean_loanbook <- function(loanbook_path) {
   
   ##Add variables
   loanbook <- loanbook %>% 
-    mutate(year = lubridate::year(loan_accepted_date) %>% factor,
+    mutate(grouped_loan_amount = case_when(loan_amount < 5e4 ~ "0-49,999",
+                                           loan_amount < 1e5 ~ "50,000 - 99,999",
+                                           loan_amount < 1.5e5 ~ "100,000 - 149,999",
+                                           loan_amount < 2e5 ~ "150,000 - 199,999",
+                                           loan_amount < 2.5e5 ~ "200,000 - 249,999",
+                                           loan_amount < 3e5 ~ "250,000 - 299,999",
+                                           loan_amount < 3.5e5 ~ "300,000 - 349,999",
+                                           loan_amount < 4e5 ~ "350,000 - 399,999",
+                                           loan_amount >= 4e5 ~"400,000+") %>% 
+             factor(levels = c("0-49,999", "50,000 - 99,999", "100,000 - 149,999",
+                               "150,000 - 199,999", "200,000 - 249,999", 
+                               "250,000 - 299,999", "300,000 - 349,999",
+                               "350,000 - 399,999", "400,000+"), ordered = TRUE),
+           no_loans = loan_amount, 
+           loan_amount_by_facet = loan_amount,
+           principal_remaining_by_facet = principal_remaining,
+           principal_remaining_by_loan_amount = principal_remaining,
+           year = lubridate::year(loan_accepted_date) %>% factor,
            defaulted = principal_remaining %>% 
            replace(!(status %in% "defaulted"), 0),
-           loan_amount_by_facet = loan_amount,
            defaulted_by_loan_amount = defaulted,
-           principal_remaining_by_loan_amount = principal_remaining)
+           defaulted_by_facet = defaulted,
+           defaulted_by_loan_amount = defaulted,
+           recoveries_by_facet = recoveries,
+           recoveries_by_loan_amount = recoveries)
   return(loanbook)
+  
 }

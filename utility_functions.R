@@ -17,6 +17,89 @@ summary_stats <- function(df) {
     ) 
 }
 
+
+## Summarise data
+summarise_loanbook <- function(df = NULL,
+                               xvar = NULL,
+                               yvar = NULL, 
+                               strat = NULL, 
+                               facet = NULL) {
+  
+  ## Set up filtering
+  strat_vect  <- strat
+  if (!is.null(xvar)) {
+    strat_vect <- c(strat_vect, xvar)
+  }
+  if (!facet %in% "no_facet") {
+    strat_vect <- c(strat_vect, facet)
+  }
+  
+  ##Group loanbook for summary
+  group_df <- group_by(df, .dots = strat_vect)
+  
+  if (str_detect(yvar, "by_loan_amount")) {
+    ##Summarise, normalising by loan amount in each group
+    group_df <- group_df %>% 
+      summarise_at(.vars = yvar,
+                   .funs = funs(100 * sum(.)/sum(loan_amount)) 
+      ) %>% 
+      mutate_at(.vars = yvar, .funs = funs(round(., digits = 1)))
+    
+  }else if (str_detect(yvar, "by_facet")) {
+    ##Summarise, normalising by within facet total
+    if (facet %in% "no_facet" && is.null(xvar)) {
+        total_facet <- sum(df[[yvar]], na.rm = TRUE)
+        
+        group_df <- summarise_at(group_df, .vars = yvar,
+                                 .funs = funs(100 * sum(.)/total_facet) 
+        )
+    }else{
+
+      if (!is.null(xvar) && !facet %in% "no_facet") {
+        facet_vect <- c(facet, xvar)
+      }else if (is.null(xvar) && !facet %in% "no_facet") {
+        facet_vect <- facet
+      }else if (!is.null(xvar) && facet %in% "no_facet") {
+        facet_vect <- xvar
+      }
+      
+      total_facet <- df %>% 
+        group_by(.dots = facet_vect) %>% 
+        summarise_at(.vars = yvar, .funs = funs(sum(.))) %>% 
+        ungroup %>% 
+        rename_at(.vars =  yvar, .funs = (function(.) {"facet_sum"}))
+      
+      group_df <- group_df %>% 
+        full_join(total_facet) %>% 
+        ungroup %>% 
+        group_by(.dots = strat_vect) %>% 
+        summarise_at(.vars = yvar,
+                     .funs = funs(100 * sum(., na.rm = TRUE)/facet_sum[1]) 
+        )
+    }
+    
+    group_df <- mutate_at(group_df, 
+                          .vars = yvar, 
+                          .funs = funs(round(., digits = 1)))
+    
+  }else if (str_detect(yvar, "no_loans")) {
+    group_df <- summarise_at(group_df,
+                             .vars = yvar,
+                             .funs = funs(length(.)))
+    }else{
+    group_df <- group_df %>% 
+      summarise_at(.vars = yvar, 
+                   .funs = funs(sum(.)) 
+      ) %>% 
+      mutate_at(.vars = yvar, 
+                .funs = funs(round(./1e6, digits = 1)))
+  }
+  
+  ##Remove missing variables
+  group_df <- na.omit(group_df)
+  return(group_df)
+}
+
 ##Plot loan book summary
 plot_loanbook_summary <- function(df, 
                                   yvar, 
@@ -45,7 +128,9 @@ plot_loanbook_summary <- function(df,
   if (scaled_to_mil) {
     if (str_detect(yvar, "by_loan_amount") | str_detect(yvar, "by_facet")) {
       p <- p + ylab(paste0(yvar, " (%)"))
-    }else {
+    }else if (str_detect(yvar, "no_loans")) {
+      p <- p + ylab(paste0(yvar, " (no.)"))
+      }else {
       p <- p +
         ylab(paste0(yvar, " (£, Millions)"))
     }
@@ -60,7 +145,9 @@ plot_loanbook_summary <- function(df,
     p <- p +
       facet_wrap(facet, scales = "fixed")
   }
+
   
+    
   if (plotly) {
     ggplotly(p)
   }else{
@@ -76,51 +163,38 @@ plot_by_date <- function(df,
                          facet = "no_facet",
                          plotly = TRUE,
                          round_date = "month") {
-  wrapr::let(
-    list(X = by, Y = strat, Fa = facet), {
+  
       df <- df %>% 
         mutate(`Loan Acceptance` = 
                  lubridate::floor_date(loan_accepted_date, unit = round_date))
       
-      if (!facet %in% "no_facet") {
-        df <- df %>% dplyr::group_by(`Loan Acceptance`, Y, Fa)
-      }else{
-        df <- df %>% dplyr::group_by(`Loan Acceptance`, Y)
-      }
+      df <- df %>%
+        summarise_loanbook(xvar = "`Loan Acceptance`",
+                           yvar = by, 
+                           strat = strat, 
+                           facet = facet)
       
-      if (str_detect(by, "by_loan_amount")) {
-        df <- df  %>% 
-          dplyr::summarise(X =  100 * sum(X, na.rm = TRUE)/sum(loan_amount)) %>%
-          na.omit
-      }else{
-        df <- df  %>% 
-          dplyr::summarise(X =  sum(X, na.rm = TRUE)/1e6) %>% 
-          na.omit
-      }
-
       p <- df %>% 
-        ggplot(aes(x = `Loan Acceptance`,
-                   y = X, 
-                   colour = Y)) +
+        ggplot(aes_string(x = "`Loan Acceptance`",
+                   y = by, 
+                   colour = strat)) +
         geom_point() +
         geom_line() +
         theme_minimal() +
         theme(legend.position = "bottom")
       
-      if (str_detect(by, "by_loan_amount")) {
+      if (str_detect(by, "by_loan_amount") || str_detect(by, "by_facet")) {
         p <- p + ylab(paste0(by, " (%)")) 
-      }else {
+      }else if (str_detect(by, "no_loans")) {
+        p <- p + ylab(paste0(by, " (no.)"))
+        }else {
         p <- p + ylab(paste0(by, " (£, Millions)"))
       }
       
       if (!facet %in% "no_facet") {
         p <- p + facet_wrap(facet, scales = "fixed")
       }
-    }
-  )
-  
-  
-  
+
   if (plotly) {
     ggplotly(p) %>%
       plotly::layout(autosize = TRUE)
@@ -162,11 +236,15 @@ plot_dist <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (plotly) {
-        ggplotly(p) %>%
-          plotly::layout(autosize = TRUE)
-      }else {
-        p
+      if (!by %in% c("no_loans", "loan_amount_by_facet", 
+                          "principal_remaining_by_facet",
+                          "defaulted_by_facet", "recoveries_by_facet")) {
+        if (plotly) {
+          ggplotly(p) %>%
+            plotly::layout(autosize = TRUE)
+        }else {
+          p
+        }
       }
     }
   )
@@ -212,11 +290,15 @@ plot_scatter <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (plotly) {
-        ggplotly(p) %>%
-          plotly::layout(autosize = TRUE)
-      }else {
-        p
+      if (!by %in% c("no_loans", "loan_amount_by_facet", 
+                     "principal_remaining_by_facet",
+                     "defaulted_by_facet", "recoveries_by_facet")) {
+        if (plotly) {
+          ggplotly(p) %>%
+            plotly::layout(autosize = TRUE)
+        }else {
+          p
+        }
       }
     }
   )

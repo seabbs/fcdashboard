@@ -30,6 +30,9 @@ options(shiny.maxRequestSize = 10*1024^2)
 
 shinyServer(function(input, output) {
 
+  ##Input menu items to output menu items
+  fc_yaxis <- reactive({input$fc_yaxis})
+  
   ## Clean/Load FC data
   clean_fc_loanbook <- reactive(
     load_clean_loanbook(input$loanbook)
@@ -73,7 +76,8 @@ shinyServer(function(input, output) {
              `Security taken` = security_taken,
              `Loan term` = term,
              `Loan purpose` = loan_purpose,
-             Year = year)
+              Year = year,
+             `Grouped loan amount` = grouped_loan_amount)
   )
   
   ## Set up reactive filtering variable - funding circle loanbook dash
@@ -227,7 +231,7 @@ clean_loanbook <- p_loanbook() %>%
              `Repayments made`, `Repayments left`, `Percentage repaid`,
              `Principal remaining`, Rate, `Next payment date`,
              `Loan term`, `Loan purpose`, Region, `Repayment type`, 
-             `Security taken`, Year)
+             `Security taken`, Year, `Grouped loan amount`)
 
 if (input$filter_repaid) {
   clean_loanbook <-  clean_loanbook  %>% 
@@ -293,55 +297,10 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
   ## Exploratory plots
   ## plot loanbook summary - fc
   output$fc_plotsummary <- renderPlotly({
-    if (input$fc_facet_var %in% "no_facet") {
-      strat <- input$fc_strat_var
-    }else{
-      strat <- c(input$fc_strat_var, input$fc_facet_var)
-    }
- 
-    group_fc_loanbook <- filt_fc_loanbook() %>% 
-      group_by(.dots = strat)
-    
-    if (str_detect(input$fc_yaxis, "by_loan_amount")) {
-      group_fc_loanbook <- group_fc_loanbook %>% 
-        summarise_at(.vars = input$fc_yaxis,
-                     .funs = funs(100 * sum(.)/sum(loan_amount)) 
-        ) %>% 
-        mutate_at(.vars = input$fc_yaxis, .funs = funs(round(., digits = 1)))
-    }else if (str_detect(input$fc_yaxis, "by_facet")) {
-      
-      if (input$fc_facet_var %in% "no_facet") {
-        total_facet <- sum(filt_fc_loanbook()[[input$fc_yaxis]], na.rm = TRUE)
-
-        group_fc_loanbook <- group_fc_loanbook %>% 
-          summarise_at(.vars = input$fc_yaxis,
-                       .funs = funs(100 * sum(.)/total_facet) 
-          )
-      }else{
-        total_facet <- filt_fc_loanbook() %>% 
-          group_by(.dots = input$fc_facet_var) %>% 
-          summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.))) %>% 
-          ungroup %>% 
-          rename_at(.vars =  input$fc_yaxis, .funs = (function(.) {"facet_sum"}))
-        
-        group_fc_loanbook <- group_fc_loanbook %>% 
-          full_join(total_facet) %>% 
-          group_by(.dots = strat) %>% 
-          summarise_at(.vars = input$fc_yaxis,
-                       .funs = funs(100 * sum(.)/facet_sum[1]) 
-          )
-      }
-    
-    group_fc_loanbook <- group_fc_loanbook %>%
-      mutate_at(.vars = input$fc_yaxis, .funs = funs(round(., digits = 1)))
-    
-    }else{
-      group_fc_loanbook <- group_fc_loanbook %>% 
-        summarise_at(.vars = input$fc_yaxis, .funs = funs(sum(.)) 
-        ) %>% 
-        mutate_at(.vars = input$fc_yaxis, .funs = funs(round(./1e6, digits = 1)))
-    }
-    group_fc_loanbook  %>% 
+  filt_fc_loanbook()  %>%
+      summarise_loanbook(yvar = input$fc_yaxis,
+                         strat = input$fc_strat_var,
+                         facet = input$fc_facet_var) %>% 
       plot_loanbook_summary(yvar = input$fc_yaxis, 
                               strat = input$fc_strat_var,
                               facet = input$fc_facet_var,
@@ -352,63 +311,17 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
   
   ## plot loanbook summary - personal
   output$p_plotsummary <- renderPlotly({
-    if (input$p_facet_var %in% "no_facet") {
-      strat <- input$p_strat_var
-    }else{
-      strat <- c(input$p_strat_var, input$p_facet_var)
-    }
-    
-    group_p_loanbook <- filt_p_loanbook() %>% 
-      group_by(.dots = strat)
-    
-    if (str_detect(input$p_yaxis, "by_loan_amount")) {
-      group_p_loanbook <-   group_p_loanbook %>% 
-        summarise_at(.vars = input$p_yaxis,
-                     .funs = funs(100 * sum(., na.rm = TRUE)/sum(loan_amount)) 
-        ) %>% 
-        mutate_at(.vars = input$p_yaxis, .funs = funs(round(., digits = 1)))
-    }else if (str_detect(input$p_yaxis, "by_facet")) {
-      
-      if (input$p_facet_var %in% "no_facet") {
-        total_facet <- sum(filt_p_loanbook()[[input$p_yaxis]], na.rm = TRUE)
-        
-        group_p_loanbook <- group_p_loanbook %>% 
-          summarise_at(.vars = input$p_yaxis,
-                       .funs = funs(100 * sum(.)/total_facet) 
-          )
-      }else{
-        total_facet <- filt_p_loanbook() %>% 
-          group_by(.dots = input$p_facet_var) %>% 
-          summarise_at(.vars = input$p_yaxis, .funs = funs(sum(.))) %>% 
-          ungroup %>% 
-          rename_at(.vars =  input$p_yaxis, .funs = (function(.) {"facet_sum"}))
-        
-        group_p_loanbook <- group_p_loanbook %>% 
-          full_join(total_facet) %>% 
-          group_by(.dots = strat) %>% 
-          summarise_at(.vars = input$p_yaxis,
-                       .funs = funs(100 * sum(.)/facet_sum[1]) 
-          )
-      }
-      
-      group_p_loanbook <- group_p_loanbook %>%
-        mutate_at(.vars = input$p_yaxis, .funs = funs(round(., digits = 1)))
-      
-    }else {
-      group_p_loanbook <-   group_p_loanbook %>% 
-        summarise_at(.vars = input$p_yaxis, 
-                     .funs = funs(sum(., na.rm = TRUE))
-        ) %>% 
-        mutate_at(.vars = input$p_yaxis, .funs = funs(round(./1e6, digits = 1)))
-    }
-    
-      group_p_loanbook %>% 
+    filt_p_loanbook()  %>%
+      summarise_loanbook(yvar = input$p_yaxis,
+                         strat = input$p_strat_var,
+                         facet = input$p_facet_var) %>% 
       plot_loanbook_summary(yvar = input$p_yaxis, 
-                              strat = input$p_strat_var,
-                              facet = input$p_facet_var,
-                              scaled_to_mil = TRUE,
-                              plotly = TRUE)
+                            strat = input$p_strat_var,
+                            facet = input$p_facet_var,
+                            scaled_to_mil = TRUE,
+                            plotly = TRUE)
   })
+  
   ## Plot total lent by time
   output$fc_plottotal <- renderPlotly(
       plot_by_date(filt_fc_loanbook(), 
