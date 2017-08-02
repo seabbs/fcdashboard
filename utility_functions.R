@@ -236,9 +236,7 @@ plot_dist <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (!by %in% c("no_loans", "loan_amount_by_facet", 
-                          "principal_remaining_by_facet",
-                          "defaulted_by_facet", "recoveries_by_facet")) {
+      if (!by %in% c("no_loans") && !str_detect(by, "by_facet")) {
         if (plotly) {
           ggplotly(p) %>%
             plotly::layout(autosize = TRUE)
@@ -290,9 +288,7 @@ plot_scatter <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (!by %in% c("no_loans", "loan_amount_by_facet", 
-                     "principal_remaining_by_facet",
-                     "defaulted_by_facet", "recoveries_by_facet")) {
+      if (!by %in% c("no_loans") && !str_detect(by, "by_facet")) {
         if (plotly) {
           ggplotly(p) %>%
             plotly::layout(autosize = TRUE)

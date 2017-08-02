@@ -78,7 +78,10 @@ load_clean_loanbook <- function(loanbook_path) {
            defaulted_by_facet = defaulted,
            defaulted_by_loan_amount = defaulted,
            recoveries_by_facet = recoveries,
-           recoveries_by_loan_amount = recoveries)
+           recoveries_by_loan_amount = recoveries,
+           unrecovered = defaulted - recoveries,
+           unrecovered_by_facet = unrecovered,
+           unrecovered_by_loan_amount = unrecovered)
   return(loanbook)
   
 }
