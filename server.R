@@ -231,7 +231,7 @@ clean_loanbook <- p_loanbook() %>%
              `Repayments made`, `Repayments left`, `Percentage repaid`,
              `Principal remaining`, Rate, `Next payment date`,
              `Loan term`, `Loan purpose`, Region, `Repayment type`, 
-             `Security taken`, Year, `Grouped loan amount`)
+             `Security taken`,`Grouped loan amount`, day, day_of_week, week, month, year)
 
 if (input$filter_repaid) {
   clean_loanbook <-  clean_loanbook  %>% 

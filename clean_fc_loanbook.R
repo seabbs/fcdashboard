@@ -71,7 +71,6 @@ load_clean_loanbook <- function(loanbook_path) {
            loan_amount_by_facet = loan_amount,
            principal_remaining_by_facet = principal_remaining,
            principal_remaining_by_loan_amount = principal_remaining,
-           year = lubridate::year(loan_accepted_date) %>% factor,
            defaulted = principal_remaining %>% 
            replace(!(status %in% "defaulted"), 0),
            defaulted_by_loan_amount = defaulted,
@@ -83,7 +82,13 @@ load_clean_loanbook <- function(loanbook_path) {
            unrecovered = defaulted - recoveries,
            unrecovered_by_facet = unrecovered,
            unrecovered_by_loan_amount = unrecovered,
-           unrecovered_by_defaulted = unrecovered)
+           unrecovered_by_defaulted = unrecovered,
+           day = lubridate::day(loan_accepted_date) %>%  factor,
+           day_of_week = lubridate::wday(loan_accepted_date, label = TRUE),
+           week = lubridate::week(loan_accepted_date) %>% factor,
+           month = lubridate::month(loan_accepted_date, label = TRUE),
+           year = lubridate::year(loan_accepted_date) %>% factor
+           )
   return(loanbook)
   
 }

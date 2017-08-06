@@ -106,7 +106,11 @@ selectInput("fc_yaxis",
                                     `Whole loan` = "whole_loan",
                                     `Repayment type` = "repayment_type",
                                     `Security taken` = "security_taken",
-                                    Year = "year"
+                                     Day = "day",
+                                    `Day of week` = "day_of_week",
+                                     Week = "week", 
+                                     Month = "month",
+                                     Year = "year"
                                )
                                
                    ),
@@ -127,6 +131,10 @@ selectInput("fc_yaxis",
                                      `Whole loan` = "whole_loan",
                                      `Repayment type` = "repayment_type",
                                      `Security taken` = "security_taken",
+                                     Day = "day",
+                                     `Day of week` = "day_of_week",
+                                     Week = "week", 
+                                     Month = "month",
                                      Year = "year"
                                 )
                                 
@@ -148,7 +156,11 @@ selectInput("fc_yaxis",
                        `Whole loan` = "whole_loan",
                        `Repayment type` = "repayment_type",
                        `Security taken` = "security_taken",
-                        Year = "year"
+                      Day = "day",
+                      `Day of week` = "day_of_week",
+                      Week = "week", 
+                      Month = "month",
+                      Year = "year"
                     )),
                   conditionalPanel(condition = "input.fc_dash_filter != 'no_filter'",
                                    uiOutput("filter_var_picker_fc_dash")
@@ -170,7 +182,11 @@ selectInput("fc_yaxis",
                                    `Whole loan` = "whole_loan",
                                    `Repayment type` = "repayment_type",
                                    `Security taken` = "security_taken",
-                                    Year = "year"
+                                   Day = "day",
+                                   `Day of week` = "day_of_week",
+                                   Week = "week", 
+                                   Month = "month",
+                                   Year = "year"
                               )),
                   conditionalPanel(condition = "input.fc_dash_filter_2 != 'no_filter'",
                                    uiOutput("filter_var_picker_fc_dash_2")
@@ -214,6 +230,10 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
                                   Year = "year"
                              )
                              
@@ -235,7 +255,11 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )
                              
                  ),
@@ -256,7 +280,11 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_exp_filter != 'no_filter'",
                                   uiOutput("filter_var_picker_p_exp")
@@ -278,7 +306,11 @@ conditionalPanel(condition = 'input.menu == "p_exploratory"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_exp_filter_2 != 'no_filter'",
                                   uiOutput("filter_var_picker_p_exp_2")
@@ -315,7 +347,11 @@ conditionalPanel(condition = 'input.menu == "fc_pca"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              ))),
 
 conditionalPanel(condition = 'input.menu == "p_pca"',
@@ -350,7 +386,11 @@ conditionalPanel(condition = 'input.menu == "p_pca"',
                                   `Whole loan` = "whole_loan",
                                   `Repayment type` = "repayment_type",
                                   `Security taken` = "security_taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              ))),
 conditionalPanel(condition = 'input.menu == "p_dashboard"',
                  selectInput("p_dash_strat", 
@@ -372,7 +412,11 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Percentage repaid` = "`Percentage repaid`",
                                   `Repayment type` = "`Repayment type`",
                                   `Security taken` = "`Security taken`",
-                                   Year = "Year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  selectInput("p_dash_facet", 
                              "Variable to facet by:",
@@ -394,7 +438,11 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Percentage repaid` = "`Percentage repaid`",
                                   `Repayment type` = "`Repayment type`",
                                   `Security taken` = "`Security taken`",
-                                   Year = "Year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  selectInput("p_dash_filter", 
                              "Variable to filter by:",
@@ -416,7 +464,11 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Percentage repaid` = "Percentage repaid",
                                   `Repayment type` = "Repayment type",
                                   `Security taken` = "Security taken", 
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_dash_filter != 'no_filter'",
                                   uiOutput("filter_var_picker")
@@ -441,7 +493,11 @@ conditionalPanel(condition = 'input.menu == "p_dashboard"',
                                   `Percentage repaid` = "Percentage repaid",
                                   `Repayment type` = "Repayment type",
                                   `Security taken` = "Security taken",
-                                   Year = "year"
+                                  Day = "day",
+                                  `Day of week` = "day_of_week",
+                                  Week = "week", 
+                                  Month = "month",
+                                  Year = "year"
                              )),
                  conditionalPanel(condition = "input.p_dash_filter_2 != 'no_filter'",
                                   uiOutput("filter_var_picker_2")
