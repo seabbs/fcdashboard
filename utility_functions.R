@@ -93,7 +93,14 @@ summarise_loanbook <- function(df = NULL,
     group_df <- summarise_at(group_df,
                              .vars = yvar,
                              .funs = funs(length(.)))
-    }else{
+    }else if (str_detect(yvar, "by_num_loans")) {
+      ##Summarise, normalising by loan amount in each group
+      group_df <- group_df %>% 
+        summarise_at(.vars = yvar,
+                     .funs = funs(100 * sum(.)/sum(no_loans)) 
+        ) %>% 
+        mutate_at(.vars = yvar, .funs = funs(round(., digits = 1)))
+      }else{
     group_df <- group_df %>% 
       summarise_at(.vars = yvar, 
                    .funs = funs(sum(.)) 
@@ -135,7 +142,8 @@ plot_loanbook_summary <- function(df,
   if (scaled_to_mil) {
     if (str_detect(yvar, "by_loan_amount") | 
         str_detect(yvar, "by_facet") |
-        str_detect(yvar, "by_defaulted")) {
+        str_detect(yvar, "by_defaulted") |
+        str_detect(yvar, "by_num_loans")) {
       p <- p + ylab(paste0(yvar, " (%)"))
     }else if (str_detect(yvar, "no_loans")) {
       p <- p + ylab(paste0(yvar, " (no.)"))
@@ -194,7 +202,8 @@ plot_by_date <- function(df,
       
       if (str_detect(by, "by_loan_amount") || 
           str_detect(by, "by_facet") || 
-          str_detect(by, "by_defaulted")) {
+          str_detect(by, "by_defaulted") ||
+          str_detect(by, "by_num_loans")) {
         p <- p + ylab(paste0(by, " (%)")) 
       }else if (str_detect(by, "no_loans")) {
         p <- p + ylab(paste0(by, " (no.)"))
@@ -250,7 +259,7 @@ plot_dist <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (!by %in% c("no_loans") && !str_detect(by, "by_facet")) {
+      if (!by %in% c("no_loans") && !str_detect(by, "by_facet") && !str_detect(by, "by_num_loans")) {
         if (plotly) {
           ggplotly(p) %>%
             plotly::layout(autosize = TRUE)
@@ -305,7 +314,7 @@ plot_scatter <- function(df,
         p <- p + facet_wrap(facet, scales = "fixed")
       }
       
-      if (!by %in% c("no_loans") && !str_detect(by, "by_facet")) {
+      if (!by %in% c("no_loans") && !str_detect(by, "by_facet") && !str_detect(by, "by_num_loans")) {
         if (plotly) {
           ggplotly(p) %>%
             plotly::layout(autosize = TRUE)
