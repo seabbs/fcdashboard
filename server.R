@@ -282,6 +282,13 @@ if (!input$p_dash_filter_2 %in% "no_filter") {
       filt_loanbook <- filt_loanbook
     }
     
+    if (input$p_exp_filter_repaid) {
+      filt_loanbook <-  filt_loanbook  %>% 
+        filter(!status %in% "repaid")
+    }else{
+      filt_loanbook <- filt_loanbook
+    }
+    
   })
   
   ##Summary stats
