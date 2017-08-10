@@ -51,6 +51,17 @@ sidebar <- dashboardSidebar(
   hr(),
   tipify(uiOutput("date_slider"),
          title = "Select the data range. Data out of date? Tweet @seabbs."),
+  checkboxInput('set_ref_date',
+                "Set reference date",
+                value = FALSE),
+  conditionalPanel(condition = 'input.set_ref_date',
+                   selectInput("ref_date",
+                               "Reference date:",
+                               list(`Date of loan acceptance` = "date_la",
+                                    `Date of default` = "date_d",
+                                    `Date of next payment` = "date_np",
+                                    `Date of repayment` = "date_fp"))
+  ),
   conditionalPanel(condition = 'input.menu == "readme"',
                    fileInput("loanbook", 
                              "Upload FC loanbook",
@@ -65,8 +76,7 @@ sidebar <- dashboardSidebar(
                                "text/csv",
                                "text/comma-seperated-values,text/plain",
                                ".csv")
-                   )
-                             ),
+                   )),
   conditionalPanel(condition = 'input.menu == "fc_dashboard"',
 selectInput("fc_yaxis", 
                                "Variable to summarise:",

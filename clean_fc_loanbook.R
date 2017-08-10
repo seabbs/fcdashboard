@@ -2,7 +2,8 @@
 library(tidyverse)
 
 ## Clean and load fc loanbook
-load_clean_loanbook <- function(loanbook_path) {
+load_clean_loanbook <- function(loanbook_path,
+                                ref_date = "date_la") {
   if (is.null(loanbook_path)) {
     ## path of loanbook 
     path  <- file.path("loanbook.csv")
@@ -48,6 +49,32 @@ load_clean_loanbook <- function(loanbook_path) {
                factor(ordered = TRUE)
                )
   
+    ## Add date of default - assuming it is date of acceptance plus number of repayments made
+    loanbook <- loanbook %>% 
+      mutate(date_of_default = loan_accepted_date %>% 
+               replace(!status %in% "defaulted", NA)
+      ) %>% 
+      mutate(date_of_default = date_of_default  %m+%
+               months(as.numeric(as.character(repayments_made))))
+    
+  ## set reference date - dropping data missing reference date
+  if (ref_date %in% "date_la" || is.null(ref_date)) {
+      loanbook <- loanbook %>% 
+        mutate(ref_date = loan_accepted_date)
+   }else if (ref_date %in% "date_d") {
+      loanbook <- loanbook %>% 
+        mutate(ref_date = date_of_default)
+    }else if (ref_date %in% "date_np") {
+      loanbook <- loanbook %>% 
+        mutate(ref_date = next_repayment)
+    }else if (ref_date %in% "date_fp") {
+      loanbook <- loanbook %>% 
+        mutate(ref_date = date_repaid)
+    }
+    
+  loanbook <- loanbook %>% 
+    filter(!is.na(ref_date))
+  
   ## Change loan term to an ordinal factor
   loanbook <- loanbook %>% 
     mutate(term = term %>% factor(ordered = TRUE))
@@ -87,11 +114,11 @@ load_clean_loanbook <- function(loanbook_path) {
            unrecovered_by_loan_amount = unrecovered,
            unrecovered_by_num_loans = ifelse(unrecovered > 0, 1, 0),
            unrecovered_by_defaulted = unrecovered,
-           day = lubridate::day(loan_accepted_date) %>%  factor,
-           day_of_week = lubridate::wday(loan_accepted_date, label = TRUE),
-           week = lubridate::week(loan_accepted_date) %>% factor,
-           month = lubridate::month(loan_accepted_date, label = TRUE),
-           year = lubridate::year(loan_accepted_date) %>% factor
+           day = lubridate::day(ref_date) %>%  factor,
+           day_of_week = lubridate::wday(ref_date, label = TRUE),
+           week = lubridate::week(ref_date) %>% factor,
+           month = lubridate::month(ref_date, label = TRUE),
+           year = lubridate::year(ref_date) %>% factor
            )
   return(loanbook)
   

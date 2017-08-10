@@ -35,8 +35,8 @@ shinyServer(function(input, output) {
   
   ## Clean/Load FC data
   clean_fc_loanbook <- reactive(
-    load_clean_loanbook(input$loanbook)
-  )
+    load_clean_loanbook(input$loanbook,ref_date = input$ref_date)
+    )
   
   ##Clean/Load personal data
   clean_personal_loanbook <- reactive(
@@ -47,24 +47,24 @@ shinyServer(function(input, output) {
   output$date_slider <- renderUI({
     sliderInput(inputId = 'dates', 
                 label = 'Time Range',
-                min = min(clean_fc_loanbook()$loan_accepted_date),
-                max = max(clean_fc_loanbook()$loan_accepted_date),
-                value = range(clean_fc_loanbook()$loan_accepted_date),
+                min = min(clean_fc_loanbook()$ref_date),
+                max = max(clean_fc_loanbook()$ref_date),
+                value = range(clean_fc_loanbook()$ref_date),
                 timeFormat = "%b %Y")
     })
 
   ## Filter data
   fc_loanbook <- reactive(
     clean_fc_loanbook() %>% 
-      filter(loan_accepted_date >= input$dates[1],
-                        loan_accepted_date <= input$dates[2])
+      filter(ref_date >= input$dates[1],
+                        ref_date <= input$dates[2])
   )
   
   combined_loanbook <- reactive(
     clean_personal_loanbook() %>%
       bind_loanbooks(fc_loanbook(), verbose = TRUE)  %>% 
-      filter(loan_accepted_date >= input$dates[1],
-             loan_accepted_date <= input$dates[2])
+      filter(ref_date >= input$dates[1],
+             ref_date <= input$dates[2])
   )
   
   p_loanbook <- reactive(

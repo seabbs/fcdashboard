@@ -182,17 +182,17 @@ plot_by_date <- function(df,
                          round_date = "month") {
   
       df <- df %>% 
-        mutate(`Loan Acceptance` = 
-                 lubridate::floor_date(loan_accepted_date, unit = round_date))
+        mutate(Date = 
+                 lubridate::floor_date(ref_date, unit = round_date))
       
       df <- df %>%
-        summarise_loanbook(xvar = "`Loan Acceptance`",
+        summarise_loanbook(xvar = "Date",
                            yvar = by, 
                            strat = strat, 
                            facet = facet)
       
       p <- df %>% 
-        ggplot(aes_string(x = "`Loan Acceptance`",
+        ggplot(aes_string(x = "Date",
                    y = by, 
                    colour = strat)) +
         geom_point() +
