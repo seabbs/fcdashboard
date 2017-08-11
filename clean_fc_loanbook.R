@@ -12,7 +12,7 @@ load_clean_loanbook <- function(loanbook_path,
   }
   
   ## Load data with miss spec as N/A
-  loanbook <- read_csv(path, na='N/A')
+  loanbook <- read_csv(path, na = 'N/A')
   
   ## Clean loan status text
   loanbook <- loanbook %>% 
@@ -41,7 +41,13 @@ load_clean_loanbook <- function(loanbook_path,
                                'D', 
                                'E')
              ))
-           
+    
+    ## Clean date of next repayment
+    loanbook <- loanbook %>% 
+      mutate(next_repayment = next_repayment %>% 
+               replace(next_repayment %in% "", NA) %>% 
+               date)
+    
     ## Add repayments made
     loanbook <- loanbook %>% 
       mutate(repayments_made = term - payments_remaining) %>% 

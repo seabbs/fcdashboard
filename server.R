@@ -57,7 +57,7 @@ shinyServer(function(input, output) {
   fc_loanbook <- reactive(
     clean_fc_loanbook() %>% 
       filter(ref_date >= input$dates[1],
-                        ref_date <= input$dates[2])
+             ref_date <= input$dates[2])
   )
   
   combined_loanbook <- reactive(
