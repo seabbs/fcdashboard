@@ -16,6 +16,7 @@ RUN apt-get update && \
     libxml2-dev \
     libgdal-dev \
     libproj-dev \
+    && apt-get clean
 
 ## Install R packages - MRAN
 RUN Rscript -e 'install.packages(c("pkgconfig", "irlba", "igraph", "shinydashboard", \
