@@ -1,11 +1,14 @@
-## Start with the tidyverse docker image
-FROM rocker/shiny:latest
 
-MAINTAINER "Sam Abbott" sam.abbott@bristol.ac.uk
+## Start rocker r image
+FROM rocker/r-ver:3.4.4
 
+MAINTAINER "Sam Abbott" contact@samabbott.co.uk
+
+## Get libs required by packages
 RUN apt-get update && \
     apt-get install -y \
     libssl-dev \
+    libcurl4-openssl-dev \
     libssh2-1-dev \
     libnlopt0 \
     libnlopt-dev \
@@ -13,34 +16,18 @@ RUN apt-get update && \
     libxml2-dev \
     libgdal-dev \
     libproj-dev \
-    && apt-get clean
 
-## install igraph due to CRAN bug from github
-RUN install2.r --error \
-      --deps TRUE \
-      pkgconfig \
-      irlba \
-      remotes
+## Install R packages - MRAN
+RUN Rscript -e 'install.packages(c("pkgconfig", "irlba", "igraph", "shinydashboard", \
+                                   "shinyBS", "shinyWidgets", "tidyverse", "DT", "rmarkdown", \
+                                   "e1071", "caret", "ggfortify, "plotly", "lubridate", "wrapr, "stringr"))'
 
-RUN installGithub.r igraph/rigraph \
-&& rm -rf /tmp/downloaded_packages/
+ADD . home/fcdashboard
 
-## Install cran packages
-RUN install2.r --error \
-    --deps TRUE \
-     shinydashboard \
-     shinyBS \
-     shinyWidgets \
-     tidyverse \
-     DT \
-     rmarkdown \
-     e1071 \
-     caret \
-     ggfortify \
-     plotly \
-     lubridate \
-     wrapr \
-     stringr 
+WORKDIR  home/fcdashboard
 
-RUN rm -r /srv/shiny-server/*
-ADD . /srv/shiny-server/fcdashboard
+EXPOSE 3838
+
+## Create log file
+CMD R -e 'shiny::runApp(port = 3838)'
+
