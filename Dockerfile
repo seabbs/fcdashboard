@@ -19,11 +19,11 @@ RUN apt-get update && \
     && apt-get clean
 
 ## Install R packages - MRAN
-RUN Rscript -e 'install.packages(c("pkgconfig", "irlba", "igraph", "shinydashboard"))
+RUN Rscript -e 'install.packages(c("pkgconfig", "irlba", "igraph", "shinydashboard"))'
 
-RUN Rscript -e 'install.packages(c("shinyBS", "shinyWidgets", "tidyverse", "DT", "rmarkdown"))
+RUN Rscript -e 'install.packages(c("shinyBS", "shinyWidgets", "tidyverse", "DT", "rmarkdown"))'
 
-RUN Rscript -e 'install.packages(c( "e1071", "caret", "ggfortify, "plotly", "lubridate", "wrapr, "stringr"))
+RUN Rscript -e 'install.packages(c( "e1071", "caret", "ggfortify, "plotly", "lubridate", "wrapr, "stringr"))'
 
 ADD . home/fcdashboard
 
