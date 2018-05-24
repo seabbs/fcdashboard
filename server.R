@@ -26,7 +26,7 @@ source("personal_loanbook.R")
 options(warn = -1)
 
 ## Increase upload limit
-options(shiny.maxRequestSize = 10*1024^2) 
+options(shiny.maxRequestSize = 20*1024^2) 
 
 shinyServer(function(input, output) {
 
