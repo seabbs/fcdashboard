@@ -6,7 +6,7 @@ load_clean_loanbook <- function(loanbook_path,
                                 ref_date = "date_la") {
   if (is.null(loanbook_path)) {
     ## path of loanbook 
-    path  <- file.path("loanbook.csv")
+    path  <- file.path("storage", "loanbook.csv")
   }else {
     path <- loanbook_path$datapath
   }
